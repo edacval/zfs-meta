@@ -37,7 +37,6 @@ pkgname=("zfs-linux${_alias}${_pkgsuffix}"
          "zfs-linux${_alias}-headers${_pkgsuffix}"
          "spl-linux${_alias}-headers${_pkgsuffix}")
 pkgver=4.13.7.1.0.7.2
-_userspacever="${pkgver/#${_kpkgver/-/.}.}"
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
@@ -66,13 +65,8 @@ pkgver() {
 
 prepare() {
     # Remove unwanted or useless features
-    sed -i \
-        -e '/^SUBDIRS/ s/ rpm//' \
-        "${srcdir}/spl/Makefile.am"
-    sed -i \
-        -e '/^SUBDIRS/ s/ contrib//' \
-        -e '/^SUBDIRS/ s/ rpm//' \
-        -e '/^SUBDIRS/ s/ tests//' \
+    sed -i -e '/^SUBDIRS/ s/ rpm//' \
+        "${srcdir}/spl/Makefile.am" \
         "${srcdir}/zfs/Makefile.am"
 }
 
@@ -115,7 +109,7 @@ _package-zfs-linux() {
     depends=("kmod"
             "linux${_kernelname}=${_kpkgver}"
             "spl-linux${_alias}${_pkgsuffix}=$pkgver"
-            "zfs-utils=${_userspacever}")
+            "zfs-utils=${pkgver/#${_kpkgver/-/.}.}")
     conflicts=("zfs-linux${_kernelname}")
     provides=( "zfs-linux${_kernelname}")
 
@@ -148,7 +142,7 @@ _package-spl-linux() {
     license=("GPL")
     depends=("kmod"
             "linux${_kernelname}=${_kpkgver}"
-            "spl-utils=${_userspacever}")
+            "spl-utils=${pkgver/#${_kpkgver/-/.}.}")
     conflicts=("spl-linux${_kernelname}")
     provides=( "spl-linux${_kernelname}")
 

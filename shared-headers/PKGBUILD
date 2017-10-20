@@ -61,11 +61,8 @@ pkgver() {
 
 prepare() {
     # Remove unwanted or useless features
-    sed -i \
-        -e '/^SUBDIRS/ s/ rpm//' \
-        "${srcdir}/spl/Makefile.am"
-    sed -i \
-        -e '/^SUBDIRS/ s/ rpm//' \
+    sed -i -e '/^SUBDIRS/ s/ rpm//' \
+        "${srcdir}/spl/Makefile.am" \
         "${srcdir}/zfs/Makefile.am"
 }
 
