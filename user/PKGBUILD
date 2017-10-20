@@ -65,7 +65,6 @@ prepare() {
 }
 
 build() {
-    [[ $_debug ]] && return
     cd "${srcdir}/spl"
     ./autogen.sh
     ./configure --prefix=/usr \

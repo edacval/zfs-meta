@@ -3,4 +3,4 @@
 !/.gitignore
 !/user/
 !/kernel/
-!/shared/
+!/shared-headers/
