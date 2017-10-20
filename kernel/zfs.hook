@@ -1,0 +1,10 @@
+[Trigger]
+Type = Package
+Operation = Upgrade
+Target = zfs-linux_alias_pkgsuffix
+Target = spl-linux_alias_pkgsuffix
+
+[Action]
+Description = Updating linux_kernelname initcpios for zfs/spl
+When = PostTransaction
+Exec = /usr/bin/mkinitcpio -p linux_kernelname

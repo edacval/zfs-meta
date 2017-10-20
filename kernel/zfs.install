@@ -1,0 +1,47 @@
+post_install() {
+    run_depmod
+}
+
+post_remove() {
+    run_depmod
+    check_initramfs
+}
+
+post_upgrade() {
+    run_depmod
+}
+
+run_depmod() {
+    echo ">>> Updating ZFS module dependencies"
+    depmod -a _kpkgver_alias
+}
+
+check_initramfs() {
+    declare -a PRESETS
+    declare -A mkinitcpio_confs
+    local conf_file preset conf_file_var ALL_config HOOKS hooks
+    [[ -r /etc/mkinitcpio.d/linux_kernelname.preset ]] \
+        && source /etc/mkinitcpio.d/linux_kernelname.preset
+
+    for preset in "${PRESETS[@]}"; do
+        conf_file_var="${preset}_config"
+        if [[ -n ${!conf_file_var:-} ]]; then
+            mkinitcpio_confs[${!conf_file_var}]=
+        else
+            mkinitcpio_confs[$ALL_config]=
+        fi
+    done
+
+    for conf_file in "${!mkinitcpio_confs[@]}"; do
+        HOOKS=
+        [[ -r "$conf_file" ]] && source "$conf_file"
+        hooks=" $HOOKS "
+        if [[ -z "${hooks##* zfs *}" ]]; then
+            echo
+            echo ">>> The zfs-linux_alias_pkgsuffix package have been removed, but 'zfs' remains in the 'HOOKS'"
+            echo ">>> list in ${conf_file} ! You will need to remove 'zfs' from the 'HOOKS' list"
+            echo ">>> and then regenerate the initial ramdisk."
+            echo
+        fi
+    done
+}
