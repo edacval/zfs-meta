@@ -1,0 +1,199 @@
+# Maintainer <edacval at gmail dot com>
+
+_kernelname=${_kernelname:-}
+_alias=${_kernelname:--ARCH}
+_kpkgver=${_kpkgver:-$(pacman -S --print-format '%v' linux${_kernelname})}
+
+unset -v _zfsrev _splrev
+case ${_buildtype} in
+    branch)
+        _branch=${_branch:-0.7-release}
+        _zfsrev=${_zfsrev:-zfs-${_branch}}
+        _splrev=${_splrev:-spl-${_branch}}
+        _pkgsuffix=-git
+        ;;
+    commit)
+        _zfscommit=${_zfscommit:-origin/HEAD}
+        _splcommit=${_splcommit:-origin/HEAD}
+        _zfsrev=${_zfsrev:-${_zfscommit}}
+        _splrev=${_splrev:-${_splcommit}}
+        _pkgsuffix=-git
+        ;;
+    *)
+        _buildtype=tag
+        _tag=${_tag:-0.7.2}
+        _zfsrev=${_zfsrev:-zfs-${_tag}}
+        _splrev=${_splrev:-spl-${_tag}}
+        _pkgsuffix=
+        # Prevent pkgname clash :  "_kernelname=-git _buildtype=tag"
+        # and "_kernelname=  _buildtype=(commit|branch)" will create
+        # equal named packages .So double this
+        [[ "${_kernelname}" == "-git" ]] && _pkgsuffix=-git
+        ;;
+esac
+
+pkgname=("zfs-linux${_alias}${_pkgsuffix}"
+         "spl-linux${_alias}${_pkgsuffix}"
+         "zfs-linux${_alias}-headers${_pkgsuffix}"
+         "spl-linux${_alias}-headers${_pkgsuffix}")
+pkgver=4.13.7.1.0.7.2
+_userspacever="${pkgver/#${_kpkgver/-/.}.}"
+pkgrel=1
+arch=("x86_64")
+url="http://zfsonlinux.org/"
+source=(
+    "zfs::git+https://github.com/zfsonlinux/zfs.git#${_buildtype}=${_zfsrev}"
+    "spl::git+https://github.com/zfsonlinux/spl.git#${_buildtype}=${_splrev}"
+    "zfs.hook")
+makedepends=("git" "linux${_kernelname}-headers=${_kpkgver}")
+
+pkgver() {
+    case ${_buildtype} in
+        tag)
+            printf "%s.%s" "${_kpkgver/-/.}" "${_tag}"
+            ;;
+        *)
+            local ztag=$(git --git-dir="${srcdir}/zfs/.git" describe --tags --abbrev=0)
+            local stag=$(git --git-dir="${srcdir}/spl/.git" describe --tags --abbrev=0)
+            printf "%s.%s.%s.%s.%s" "${_kpkgver/-/.}" \
+                "$(echo $ztag | sed 's/^zfs-//g; s/-//g')" \
+                "$(echo $stag | sed 's/^spl-//g; s/-//g')" \
+                "$(git --git-dir="${srcdir}/zfs/.git" rev-list ${ztag}..HEAD --count --)" \
+                "$(git --git-dir="${srcdir}/spl/.git" rev-list ${stag}..HEAD --count --)"
+            ;;
+    esac
+}
+
+prepare() {
+    # Remove unwanted or useless features
+    sed -i \
+        -e '/^SUBDIRS/ s/ rpm//' \
+        "${srcdir}/spl/Makefile.am"
+    sed -i \
+        -e '/^SUBDIRS/ s/ contrib//' \
+        -e '/^SUBDIRS/ s/ rpm//' \
+        -e '/^SUBDIRS/ s/ tests//' \
+        "${srcdir}/zfs/Makefile.am"
+}
+
+build() {
+    cd "${srcdir}/spl"
+    ./autogen.sh
+    ./configure --prefix=/usr \
+        --libexecdir=/usr/lib \
+        --localstatedir=/var \
+        --sbindir=/usr/bin \
+        --sysconfdir=/etc \
+        --with-linux=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-linux-obj=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-config=kernel
+    make
+    # Replace reference to ${srcdir} with proper path
+    sed -i "s|${srcdir}/spl/module/|/usr/lib/modules/${_kpkgver}${_alias}/extra/|" \
+        ${srcdir}/spl/module/Module.symvers
+    cd "${srcdir}/zfs"
+    ./autogen.sh
+    ./configure --prefix=/usr \
+        --libexecdir=/usr/lib \
+        --localstatedir=/var \
+        --sbindir=/usr/bin \
+        --sysconfdir=/etc \
+        --with-spl="${srcdir}/spl" \
+        --with-spl-obj="${srcdir}/spl" \
+        --with-linux=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-linux-obj=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-config=kernel
+    make
+    # Replace reference to ${srcdir} with proper path
+    sed -i "s|${srcdir}/zfs/module/|/usr/lib/modules/${_kpkgver}${_alias}/extra/|" \
+        ${srcdir}/zfs/module/Module.symvers
+}
+
+_package-zfs-linux() {
+    pkgdesc="Zettabyte File System linux${_alias} kernel module"
+    license=("CDDL")
+    depends=("kmod"
+            "linux${_kernelname}=${_kpkgver}"
+            "spl-linux${_alias}${_pkgsuffix}=$pkgver"
+            "zfs-utils=${_userspacever}")
+    conflicts=("zfs-linux${_kernelname}")
+    provides=( "zfs-linux${_kernelname}")
+
+    cd "${srcdir}/zfs/module"
+    make DESTDIR="${pkgdir}" INSTALL_MOD_PATH="/usr" install
+
+    #set correct depmod command for install
+    install=zfs.install
+    cp -f "${startdir}/${install}" "${startdir}/${install}.tmp"
+    true && install=${install}.tmp
+    sed -i \
+        -e  "s/_kernelname/${_kernelname}/g" \
+        -e  "s/_alias/${_alias}/g" \
+        -e  "s/_kpkgver/${_kpkgver}/g" \
+        -e  "s/_pkgsuffix/${_pkgsuffix}/g" \
+        "${startdir}/${install}"
+
+    # Install mkinitcpio hook
+    install -Dm644 "${srcdir}"/zfs.hook \
+        "${pkgdir}"/usr/share/libalpm/hooks/80-zfs-linux${_alias}${_pkgsuffix}.hook
+    sed -i \
+        -e "s/_alias/${_alias}/g" \
+        -e "s/_kernelname/${_kernelname}/g" \
+        -e "s/_pkgsuffix/${_pkgsuffix}/g" \
+        "${pkgdir}"/usr/share/libalpm/hooks/80-zfs-linux${_alias}${_pkgsuffix}.hook
+}
+
+_package-spl-linux() {
+    pkgdesc="Solaris Porting Layer linux${_alias} kernel module"
+    license=("GPL")
+    depends=("kmod"
+            "linux${_kernelname}=${_kpkgver}"
+            "spl-utils=${_userspacever}")
+    conflicts=("spl-linux${_kernelname}")
+    provides=( "spl-linux${_kernelname}")
+
+    cd "${srcdir}/spl/module"
+    make DESTDIR="${pkgdir}" INSTALL_MOD_PATH="/usr" install
+
+    #set correct depmod command for install
+    install=spl.install
+    cp -f "${startdir}/${install}" "${startdir}/${install}.tmp"
+    true && install=${install}.tmp
+    sed -i \
+        -e  "s/_alias/${_alias}/g" \
+        -e  "s/_kpkgver/${_kpkgver}/g" \
+        "${startdir}/${install}"
+}
+
+_package-zfs-linux-headers() {
+    pkgdesc="Zettabyte File System linux${_alias} versioned kernel headers"
+    license=("CDDL")
+    conflicts=("zfs-linux${_kernelname}-headers")
+    provides=("zfs-linux${_kernelname}-headers")
+    cd "${srcdir}/zfs"
+    make DESTDIR="${pkgdir}" install-nodist_kernelHEADERS
+}
+
+_package-spl-linux-headers() {
+    pkgdesc="Solaris Porting Layer linux${_alias} versioned kernel headers"
+    license=("GPL")
+    conflicts=("spl-linux${_kernelname}-headers")
+    provides=("spl-linux${_kernelname}-headers")
+    cd "${srcdir}/spl"
+    make DESTDIR="${pkgdir}" install-nodist_kernelHEADERS
+}
+
+# Generate packaging functions on the fly - evil trick from kernel PKGBUILD
+for _p in ${pkgname[@]}; do
+    _tmp=${_p}
+    _tmp=${_tmp/${_pkgsuffix}}
+    _tmp=${_tmp/${_alias}}
+    eval "package_${_p}() {
+        $(declare -f "_package-${_tmp}")
+        _package-${_tmp}
+    }"
+done
+
+sha256sums=('SKIP'
+            'SKIP'
+            '9c4c39046813ba3b460b8458048eaaa057e96b54dbb64b016e4d1a4577cadf02')

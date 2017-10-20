@@ -1,0 +1,138 @@
+# Maintainer <edacval at gmail dot com>
+
+unset -v _zfsrev _splrev
+case ${_buildtype} in
+    branch)
+        _branch=${_branch:-0.7-release}
+        _zfsrev=${_zfsrev:-zfs-${_branch}}
+        _splrev=${_splrev:-spl-${_branch}}
+        _pkgsuffix=-git
+        ;;
+    commit)
+        _zfscommit=${_zfscommit:-origin/HEAD}
+        _splcommit=${_splcommit:-origin/HEAD}
+        _zfsrev=${_zfsrev:-${_zfscommit}}
+        _splrev=${_splrev:-${_splcommit}}
+        _pkgsuffix=-git
+        ;;
+    *)
+        _buildtype=tag
+        _tag=${_tag:-0.7.2}
+        _zfsrev=${_zfsrev:-zfs-${_tag}}
+        _splrev=${_splrev:-spl-${_tag}}
+        _pkgsuffix=
+        ;;
+esac
+
+pkgname=("zfs-utils${_pkgsuffix}" "spl-utils${_pkgsuffix}")
+pkgver=0.7.2
+pkgrel=1
+arch=("x86_64")
+url="http://zfsonlinux.org/"
+source=(
+    "zfs::git+https://github.com/zfsonlinux/zfs.git#${_buildtype}=${_zfsrev}"
+    "spl::git+https://github.com/zfsonlinux/spl.git#${_buildtype}=${_splrev}"
+    "zfs-utils.initcpio.hook"
+    "zfs-utils.initcpio.install"
+    "zfs-utils.bash-completion-r1")
+makedepends=("git")
+
+pkgver() {
+    case ${_buildtype} in
+        tag)
+            printf "%s" "${_tag}"
+            ;;
+        *)
+            local ztag=$(git --git-dir="${srcdir}/zfs/.git" describe --tags --abbrev=0)
+            local stag=$(git --git-dir="${srcdir}/spl/.git" describe --tags --abbrev=0)
+            printf "%s.%s.%s.%s" \
+                "$(echo $ztag | sed 's/^zfs-//g; s/-//g')" \
+                "$(echo $stag | sed 's/^spl-//g; s/-//g')" \
+                "$(git --git-dir="${srcdir}/zfs/.git" rev-list ${ztag}..HEAD --count --)" \
+                "$(git --git-dir="${srcdir}/spl/.git" rev-list ${stag}..HEAD --count --)"
+            ;;
+    esac
+}
+
+prepare() {
+    # Remove unwanted or useless features
+    sed -i \
+        -e '/^SUBDIRS/ s/ rpm//' \
+        "${srcdir}/spl/Makefile.am"
+    sed -i \
+        -e '/^SUBDIRS/ s/ contrib//' \
+        -e '/^SUBDIRS/ s/ rpm//' \
+        -e '/^SUBDIRS/ s/ tests//' \
+        "${srcdir}/zfs/Makefile.am"
+}
+
+build() {
+    [[ $_debug ]] && return
+    cd "${srcdir}/spl"
+    ./autogen.sh
+    ./configure --prefix=/usr \
+        --libexecdir=/usr/lib \
+        --localstatedir=/var \
+        --sbindir=/usr/bin \
+        --sysconfdir=/etc \
+        --with-config=user
+    make
+    cd "${srcdir}/zfs"
+    ./autogen.sh
+    ./configure --prefix=/usr \
+        --libexecdir=/usr/lib \
+        --localstatedir=/var \
+        --sbindir=/usr/bin \
+        --sysconfdir=/etc \
+        --enable-systemd=yes \
+        --enable-sysvinit=no \
+        --with-mounthelperdir=/usr/bin \
+        --with-udevdir=/usr/lib/udev \
+        --with-config=user
+    make
+}
+
+_package-spl-utils() {
+    pkgdesc="Solaris Porting Layer userspace tools"
+    license=("GPL")
+    optdepends=("python: monitoring tools")
+    conflicts=("spl-utils")
+    provides=("spl-utils")
+
+    cd "${srcdir}/spl"
+    make DESTDIR="${pkgdir}" install
+}
+
+_package-zfs-utils() {
+    pkgdesc="Zettabyte File System userspace tools"
+    license=("CDDL")
+    optdepends=("python: monitoring tools"
+        "sudo: zpool status/iostat disk monitoring as unprivileged user"
+        "smartmontools: zpool status/iostat disk monitoring")
+    conflicts=("zfs-utils")
+    provides=("zfs-utils")
+
+    cd "${srcdir}/zfs"
+    make DESTDIR="${pkgdir}" install
+    # Install the support files
+    install -D -m644 "${srcdir}"/zfs-utils.initcpio.hook "${pkgdir}"/usr/lib/initcpio/hooks/zfs
+    install -D -m644 "${srcdir}"/zfs-utils.initcpio.install "${pkgdir}"/usr/lib/initcpio/install/zfs
+    install -D -m644 "${srcdir}"/zfs-utils.bash-completion-r1 "${pkgdir}"/usr/share/bash-completion/completions/zfs
+    chmod 0750  "${pkgdir}"/etc/sudoers.d
+}
+
+# Generate packaging functions on the fly - evil trick from kernel PKGBUILD
+for _p in ${pkgname[@]}; do
+    _tmp=${_p}
+    _tmp=${_tmp/${_pkgsuffix}}
+    eval "package_${_p}() {
+        $(declare -f "_package-${_tmp}")
+        _package-${_tmp}
+    }"
+done
+
+sha256sums=('SKIP'
+            'SKIP'
+            'b5f87d1d1d10443d8919125a4c139d5f4c579ca4433b2905ee826bb01defa56a'
+            'e33adabbe3f2f4866802c9d63c7810c7a42b4df2288d0cdd23376519b15b36e4'
+            'b60214f70ffffb62ffe489cbfabd2e069d14ed2a391fac0e36f914238394b540')
