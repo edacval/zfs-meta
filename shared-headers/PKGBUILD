@@ -1,0 +1,126 @@
+# Maintainer <edacval at gmail dot com>
+
+_kernelname=${_kernelname:-}
+_alias=${_kernelname:--ARCH}
+_kpkgver=${_kpkgver:-$(pacman -S --print-format '%v' linux${_kernelname})}
+
+unset -v _zfsrev _splrev
+case ${_buildtype} in
+    branch)
+        _branch=${_branch:-0.7-release}
+        _zfsrev=${_zfsrev:-zfs-${_branch}}
+        _splrev=${_splrev:-spl-${_branch}}
+        _pkgsuffix=-git
+        ;;
+    commit)
+        _zfscommit=${_zfscommit:-origin/HEAD}
+        _splcommit=${_splcommit:-origin/HEAD}
+        _zfsrev=${_zfsrev:-${_zfscommit}}
+        _splrev=${_splrev:-${_splcommit}}
+        _pkgsuffix=-git
+        ;;
+    *)
+        _buildtype=tag
+        _tag=${_tag:-0.7.2}
+        _zfsrev=${_zfsrev:-zfs-${_tag}}
+        _splrev=${_splrev:-spl-${_tag}}
+        _pkgsuffix=
+        # Prevent pkgname clash :  "_kernelname=-git _buildtype=tag"
+        # and "_kernelname=  _buildtype=(commit|branch)" will create
+        # equal named packages .So double this
+        [[ "${_kernelname}" == "-git" ]] && _pkgsuffix=-git
+        ;;
+esac
+
+pkgname=("zfs-headers-shared${_pkgsuffix}"
+         "spl-headers-shared${_pkgsuffix}")
+pkgver=0.7.2
+pkgrel=1
+arch=("x86_64")
+url="http://zfsonlinux.org/"
+source=("zfs::git+https://github.com/zfsonlinux/zfs.git#${_buildtype}=${_zfsrev}"
+        "spl::git+https://github.com/zfsonlinux/spl.git#${_buildtype}=${_splrev}")
+makedepends=("git" "linux${_kernelname}-headers=${_kpkgver}")
+
+pkgver() {
+    case ${_buildtype} in
+        tag)
+            printf "%s" "${_tag}"
+            ;;
+        *)
+            local ztag=$(git --git-dir="${srcdir}/zfs/.git" describe --tags --abbrev=0)
+            local stag=$(git --git-dir="${srcdir}/spl/.git" describe --tags --abbrev=0)
+            printf "%s.%s.%s.%s" \
+                "$(echo $ztag | sed 's/^zfs-//g; s/-//g')" \
+                "$(echo $stag | sed 's/^spl-//g; s/-//g')" \
+                "$(git --git-dir="${srcdir}/zfs/.git" rev-list ${ztag}..HEAD --count --)" \
+                "$(git --git-dir="${srcdir}/spl/.git" rev-list ${stag}..HEAD --count --)"
+            ;;
+    esac
+}
+
+prepare() {
+    # Remove unwanted or useless features
+    sed -i \
+        -e '/^SUBDIRS/ s/ rpm//' \
+        "${srcdir}/spl/Makefile.am"
+    sed -i \
+        -e '/^SUBDIRS/ s/ rpm//' \
+        "${srcdir}/zfs/Makefile.am"
+}
+
+build() {
+    cd "${srcdir}/spl"
+    ./autogen.sh
+    ./configure --prefix=/usr \
+        --libexecdir=/usr/lib \
+        --localstatedir=/var \
+        --sbindir=/usr/bin \
+        --sysconfdir=/etc \
+        --with-linux=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-linux-obj=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-config=kernel
+    cd "${srcdir}/zfs"
+    ./autogen.sh
+    ./configure --prefix=/usr \
+        --libexecdir=/usr/lib \
+        --localstatedir=/var \
+        --sbindir=/usr/bin \
+        --sysconfdir=/etc \
+        --with-spl="${srcdir}/spl" \
+        --with-spl-obj="${srcdir}/spl" \
+        --with-linux=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-linux-obj=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-config=kernel
+}
+
+_package-zfs-headers-shared() {
+    pkgdesc="Zettabyte File System shared kernel headers"
+    license=("CDDL")
+    conflicts=("zfs-headers-shared")
+    provides=( "zfs-headers-shared")
+    cd "${srcdir}/zfs/include"
+    make DESTDIR="${pkgdir}" install
+}
+
+_package-spl-headers-shared() {
+    pkgdesc="Solaris Porting Layer shared kernel headers"
+    license=("GPL")
+    conflicts=("spl-headers-shared")
+    provides=( "spl-headers-shared")
+    cd "${srcdir}/spl/include"
+    make DESTDIR="${pkgdir}" install
+}
+
+# Generate packaging functions on the fly - evil trick from kernel PKGBUILD
+for _p in ${pkgname[@]}; do
+    _tmp=${_p}
+    _tmp=${_tmp/${_pkgsuffix}}
+    eval "package_${_p}() {
+        $(declare -f "_package-${_tmp}")
+        _package-${_tmp}
+    }"
+done
+
+sha256sums=('SKIP'
+            'SKIP')
