@@ -97,7 +97,7 @@ zfs_mount_handler () {
                 ;;
             *)
                 zfs_decrypt_fs "${dataset}"
-                mount -t zfs -o "zfsutil,${rwopt_exp}" "${dataset}" "${node}/${mountpoint##${rootmnt}}"
+                mount -t zfs -o "zfsutil,${rwopt_exp}${rootflags:+,$rootflags}" "${dataset}" "${node}/${mountpoint##${rootmnt}}"
                 ;;
         esac
     done
