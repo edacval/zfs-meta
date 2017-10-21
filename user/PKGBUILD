@@ -62,6 +62,9 @@ prepare() {
         -e '/^SUBDIRS/ s/ tests//' \
         "${srcdir}/zfs/Makefile.am" \
         "${srcdir}/spl/Makefile.am"
+    # use python2
+    sed -i '1s/python\b/python2/' \
+        "${srcdir}/zfs/cmd/arc_summary/arc_summary.py"
 }
 
 build() {
@@ -103,7 +106,7 @@ _package-spl-utils() {
 _package-zfs-utils() {
     pkgdesc="Zettabyte File System userspace tools"
     license=("CDDL")
-    optdepends=("python: monitoring tools"
+    optdepends=("python2: monitoring tools"
         "sudo: zpool status/iostat disk monitoring as unprivileged user"
         "smartmontools: zpool status/iostat disk monitoring")
     conflicts=("zfs-utils")
