@@ -84,6 +84,10 @@ Command Line Setup:
         zfs_import_dir=/dev/disk/by-path
             etc.
 
+    To pass additional options for zfs mount:
+
+        rootflags=noatime,other_flag,another_flag...
+
     Following initcpio convention, the 'rw' option must be specified to load the
     pool as read/write. Pools are loaded as read only by default.
 
