@@ -2,7 +2,7 @@
 
 _kernelname=${_kernelname:-}
 _alias=${_kernelname:--ARCH}
-_kpkgver=${_kpkgver:-$(pacman -S --print-format '%v' linux${_kernelname})}
+_kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname})}
 
 unset -v _zfsrev _splrev
 case ${_buildtype} in
