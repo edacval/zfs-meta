@@ -35,7 +35,7 @@ check_initramfs() {
     for conf_file in "${!mkinitcpio_confs[@]}"; do
         HOOKS=
         [[ -r "$conf_file" ]] && source "$conf_file"
-        hooks=" $HOOKS "
+        hooks=" ${HOOKS[@]} "
         if [[ -z "${hooks##* zfs *}" ]]; then
             echo
             echo ">>> The zfs-linux_alias_pkgsuffix package have been removed, but 'zfs' remains in the 'HOOKS'"
