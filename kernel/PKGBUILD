@@ -21,7 +21,7 @@ case ${_buildtype} in
         ;;
     *)
         _buildtype=tag
-        _tag=${_tag:-0.7.3}
+        _tag=${_tag:-0.7.4}
         _zfsrev=${_zfsrev:-zfs-${_tag}}
         _splrev=${_splrev:-spl-${_tag}}
         _pkgsuffix=
