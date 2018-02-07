@@ -21,7 +21,7 @@ case ${_buildtype} in
         ;;
     *)
         _buildtype=tag
-        _tag=${_tag:-0.7.5}
+        _tag=${_tag:-0.7.6}
         _zfsrev=${_zfsrev:-zfs-${_tag}}
         _splrev=${_splrev:-spl-${_tag}}
         _pkgsuffix=
@@ -34,7 +34,7 @@ esac
 
 pkgname=("zfs-headers-shared${_pkgsuffix}"
          "spl-headers-shared${_pkgsuffix}")
-pkgver=0.7.5
+pkgver=0.7.6
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
