@@ -21,7 +21,7 @@ case ${_buildtype} in
         ;;
     *)
         _buildtype=tag
-        _tag=${_tag:-0.7.6}
+        _tag=${_tag:-0.7.7}
         _zfsrev=${_zfsrev:-zfs-${_tag}}
         _splrev=${_splrev:-spl-${_tag}}
         _pkgsuffix=
@@ -36,7 +36,7 @@ pkgname=("zfs-linux${_alias}${_pkgsuffix}"
          "spl-linux${_alias}${_pkgsuffix}"
          "zfs-linux${_alias}-headers${_pkgsuffix}"
          "spl-linux${_alias}-headers${_pkgsuffix}")
-pkgver=4.15.1.2.0.7.6
+pkgver=4.14.31.1.0.7.7
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
