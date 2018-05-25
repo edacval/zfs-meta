@@ -1,5 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
+_default_tag=0.7.9
 unset -v _zfsrev _splrev
 case ${_buildtype} in
     branch)
@@ -17,7 +18,7 @@ case ${_buildtype} in
         ;;
     *)
         _buildtype=tag
-        _tag=${_tag:-0.7.8}
+        _tag=${_tag:-${_default_tag}}
         _zfsrev=${_zfsrev:-zfs-${_tag}}
         _splrev=${_splrev:-spl-${_tag}}
         _pkgsuffix=
@@ -25,7 +26,7 @@ case ${_buildtype} in
 esac
 
 pkgname=("zfs-utils${_pkgsuffix}" "spl-utils${_pkgsuffix}")
-pkgver=0.7.8
+pkgver=0.7.9
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
