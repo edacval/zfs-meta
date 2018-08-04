@@ -68,6 +68,10 @@ prepare() {
 }
 
 build() {
+    # After (2018-07-30) commit https://git.archlinux.org/svntogit/packages.git/commit/repos/core-x86_64?h=packages/linux&id=973e9461f3f2a558bfc49f49d659ea3f7e5aec44
+    # kernel modules path cannot be guessed from linux${_kernelname}-headers package version so ugly hack:
+    : ${_kmoddir:-$(< $(pacman -Qlq linux${_kernelname}-headers | grep '/kernel\.release$'))
+
     cd "${srcdir}/spl"
     ./autogen.sh
     ./configure --prefix=/usr \
@@ -75,8 +79,8 @@ build() {
         --localstatedir=/var \
         --sbindir=/usr/bin \
         --sysconfdir=/etc \
-        --with-linux=/usr/lib/modules/${_kpkgver}${_alias}/build \
-        --with-linux-obj=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-linux=/usr/lib/modules/${_kmoddir}/build \
+        --with-linux-obj=/usr/lib/modules/${_kmoddir}/build \
         --with-config=kernel
     cd "${srcdir}/zfs"
     ./autogen.sh
@@ -87,8 +91,8 @@ build() {
         --sysconfdir=/etc \
         --with-spl="${srcdir}/spl" \
         --with-spl-obj="${srcdir}/spl" \
-        --with-linux=/usr/lib/modules/${_kpkgver}${_alias}/build \
-        --with-linux-obj=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-linux=/usr/lib/modules/${_kmoddir}/build \
+        --with-linux-obj=/usr/lib/modules/${_kmoddir}/build \
         --with-config=kernel
 }
 

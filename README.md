@@ -1,6 +1,6 @@
 ## ZFS PKGBUILDs for  Arch Linux with sane defaults
 ### Usage
-#### Build newest tagged release with latest default kernel package - this is default
+#### Build newest tagged release with latest default Arch kernel package - this is default
 ```sh
 cd user
 makepkg -sCr
@@ -42,13 +42,14 @@ _kpkgver
 _splcommit
 _tag
 _zfscommit
+_kmoddir
 ```
 
 ### FAQ
 #### What the pkg 4.13.7.1.0.7.2.0.7.1.13.1 version string contains?
 * 4.13.7.1 = built against kernel pkg 4.13.7-1 , `-` replaced with `.`
-* 0.7.2 = the nearest ZFS tag in the past that is reachable on current branch from checkout. `zfs-` prefix striped.
-* 0.7.1 = the nearest SPL tag in the past that is reachable on current branch from checkout. `spl-` prefix striped.
+* 0.7.2 = the nearest ZFS tag in the past that is reachable on current branch from checkout, `zfs-` prefix striped.
+* 0.7.1 = the nearest SPL tag in the past that is reachable on current branch from checkout, `spl-` prefix striped.
 * 13 = Number of commits in ZFS since zfs-0.7.2 tag
 * 1 = Number of commits in SPL since spl-0.7.1 tag
 

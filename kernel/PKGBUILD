@@ -37,7 +37,7 @@ pkgname=("zfs-linux${_alias}${_pkgsuffix}"
          "spl-linux${_alias}${_pkgsuffix}"
          "zfs-linux${_alias}-headers${_pkgsuffix}"
          "spl-linux${_alias}-headers${_pkgsuffix}")
-pkgver=4.16.11.1.0.7.9
+pkgver=4.17.11.1.0.7.9
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
@@ -72,6 +72,10 @@ prepare() {
 }
 
 build() {
+    # After (2018-07-30) commit https://git.archlinux.org/svntogit/packages.git/commit/repos/core-x86_64?h=packages/linux&id=973e9461f3f2a558bfc49f49d659ea3f7e5aec44
+    # kernel modules path cannot be guessed from linux${_kernelname}-headers package version so ugly hack:
+    : ${_kmoddir:-$(< $(pacman -Qlq linux${_kernelname}-headers | grep '/kernel\.release$'))
+
     cd "${srcdir}/spl"
     ./autogen.sh
     ./configure --prefix=/usr \
@@ -79,12 +83,12 @@ build() {
         --localstatedir=/var \
         --sbindir=/usr/bin \
         --sysconfdir=/etc \
-        --with-linux=/usr/lib/modules/${_kpkgver}${_alias}/build \
-        --with-linux-obj=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-linux=/usr/lib/modules/${_kmoddir}/build \
+        --with-linux-obj=/usr/lib/modules/${_kmoddir}/build \
         --with-config=kernel
     make
     # Replace reference to ${srcdir} with proper path
-    sed -i "s|${srcdir}/spl/module/|/usr/lib/modules/${_kpkgver}${_alias}/extra/|" \
+    sed -i "s|${srcdir}/spl/module/|/usr/lib/modules/${_kmoddir}/extra/|" \
         ${srcdir}/spl/module/Module.symvers
     cd "${srcdir}/zfs"
     ./autogen.sh
@@ -95,12 +99,12 @@ build() {
         --sysconfdir=/etc \
         --with-spl="${srcdir}/spl" \
         --with-spl-obj="${srcdir}/spl" \
-        --with-linux=/usr/lib/modules/${_kpkgver}${_alias}/build \
-        --with-linux-obj=/usr/lib/modules/${_kpkgver}${_alias}/build \
+        --with-linux=/usr/lib/modules/${_kmoddir}/build \
+        --with-linux-obj=/usr/lib/modules/${_kmoddir}/build \
         --with-config=kernel
     make
     # Replace reference to ${srcdir} with proper path
-    sed -i "s|${srcdir}/zfs/module/|/usr/lib/modules/${_kpkgver}${_alias}/extra/|" \
+    sed -i "s|${srcdir}/zfs/module/|/usr/lib/modules/${_kmoddir}/extra/|" \
         ${srcdir}/zfs/module/Module.symvers
 }
 
@@ -116,17 +120,6 @@ _package-zfs-linux() {
 
     cd "${srcdir}/zfs/module"
     make DESTDIR="${pkgdir}" INSTALL_MOD_PATH="/usr" install
-
-    #set correct depmod command for install
-    install=zfs.install
-    cp -f "${startdir}/${install}" "${startdir}/${install}.tmp"
-    true && install=${install}.tmp
-    sed -i \
-        -e  "s/_kernelname/${_kernelname}/g" \
-        -e  "s/_alias/${_alias}/g" \
-        -e  "s/_kpkgver/${_kpkgver}/g" \
-        -e  "s/_pkgsuffix/${_pkgsuffix}/g" \
-        "${startdir}/${install}"
 
     # Install mkinitcpio hook
     install -Dm644 "${srcdir}"/zfs.hook \
@@ -149,15 +142,6 @@ _package-spl-linux() {
 
     cd "${srcdir}/spl/module"
     make DESTDIR="${pkgdir}" INSTALL_MOD_PATH="/usr" install
-
-    #set correct depmod command for install
-    install=spl.install
-    cp -f "${startdir}/${install}" "${startdir}/${install}.tmp"
-    true && install=${install}.tmp
-    sed -i \
-        -e  "s/_alias/${_alias}/g" \
-        -e  "s/_kpkgver/${_kpkgver}/g" \
-        "${startdir}/${install}"
 }
 
 _package-zfs-linux-headers() {
