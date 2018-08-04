@@ -1,0 +1,59 @@
+[Trigger]
+Type = Package
+Operation = Remove
+Target = zfs-linux_alias_pkgsuffix
+Target = spl-linux_alias_pkgsuffix
+
+[Action]
+Description = Checking for leftover zfs hook in mkinitcpio.conf
+When = PostTransaction
+Exec = /usr/bin/bash -c'
+    declare -A confs
+    source /etc/mkinitcpio.d/linux_kernelname.preset
+    for preset in "${PRESETS[@]}"; do
+        name="${preset}_config"
+        if [[ -n ${!name:-} ]]; then
+            confs[${!name}]=
+        else
+            confs[$ALL_config]=
+        fi
+    done;
+
+    for f in "${!confs[@]}"; do
+        HOOKS=
+        source "$f"
+        if [[ ${HOOKS[@]/zfs} != ${HOOKS[@]} ]] ; then
+            echo
+            echo ">>> The zfs-linux_alias_pkgsuffix package have been removed, but 'zfs' remains in the 'HOOKS'"
+            echo ">>> list in $f ! You will need to remove 'zfs' from the 'HOOKS' list"
+            echo ">>> and then regenerate the initial ramdisk."
+            echo
+        fi
+    done
+'
+check_initramfs() {
+    declare -A confs
+    local conf preset conf_file
+    . /etc/mkinitcpio.d/linux_kernelname.preset
+
+    for preset in "${PRESETS[@]}"; do
+        conf_file="${preset}_config"
+        if [[ -n ${!conf_file:-} ]]; then
+            confs[${!conf_file}]=
+        else
+            confs[$ALL_config]=
+        fi
+    done
+
+    for conf in "${!confs[@]}"; do
+        unset -v HOOKS
+        source "$conf"
+        if [[ ${HOOKS[@]/zfs} != ${HOOKS[@]} ]] ; then
+            echo
+            echo ">>> The zfs-linux_alias_pkgsuffix package have been removed, but 'zfs' remains in the 'HOOKS'"
+            echo ">>> list in ${conf} ! You will need to remove 'zfs' from the 'HOOKS' list"
+            echo ">>> and then regenerate the initial ramdisk."
+            echo
+        fi
+    done
+}
