@@ -1,31 +1,39 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=0.7.9
+_default_branch=0.7-release
 _kernelname=${_kernelname:-}
 _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux-headers${_kernelname})}
 
-_tag=${_tag:-${_default_tag}}
-_zfsrev=${_zfsrev:-zfs-${_tag}}
-_splrev=${_splrev:-spl-${_tag}}
+case ${_buildtype} in
+    branch)
+        _branch=${_branch:-${_default_branch}}
+        _zfsrev=${_zfsrev:-zfs-${_branch}}
+        ;;
+    *)
+        _zfscommit=${_zfscommit:-origin/HEAD}
+        _zfsrev=${_zfsrev:-${_zfscommit}}
+        _buildtype=commit
+        ;;
+esac
 
-pkgname=("zfs-headers-shared"
-         "spl-headers-shared")
+pkgname=("zfs-headers-shared-git")
 pkgver=0.7.9
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
-source=("zfs::git+https://github.com/zfsonlinux/zfs.git#tag=${_zfsrev}"
-        "spl::git+https://github.com/zfsonlinux/spl.git#tag=${_splrev}")
+source=("zfs::git+https://github.com/zfsonlinux/zfs.git#${_buildtype}=${_zfsrev}")
 makedepends=("git" "linux${_kernelname}-headers=${_kpkgver}")
 
 pkgver() {
-            printf "%s" "${_tag}"
+    local ztag=$(git --git-dir="${srcdir}/zfs/.git" describe --tags --abbrev=0)
+        printf "%s.%s" \
+        "$(echo $ztag | sed 's/^zfs-//g; s/-//g')" \
+        "$(git --git-dir="${srcdir}/zfs/.git" rev-list ${ztag}..HEAD --count --)"
 }
 
 prepare() {
     # Remove unwanted or useless features
     sed -i -e '/^SUBDIRS/ s/ rpm//' \
-        "${srcdir}/spl/Makefile.am" \
         "${srcdir}/zfs/Makefile.am"
 }
 
@@ -34,16 +42,6 @@ build() {
     # kernel modules path cannot be guessed from linux${_kernelname}-headers package version so ugly hack:
     _kmoddir=${_kmoddir:-$(< $(pacman -Qlq linux${_kernelname}-headers | grep '/kernel\.release$'))}
 
-    cd "${srcdir}/spl"
-    ./autogen.sh
-    ./configure --prefix=/usr \
-        --libexecdir=/usr/lib \
-        --localstatedir=/var \
-        --sbindir=/usr/bin \
-        --sysconfdir=/etc \
-        --with-linux=/usr/lib/modules/${_kmoddir}/build \
-        --with-linux-obj=/usr/lib/modules/${_kmoddir}/build \
-        --with-config=kernel
     cd "${srcdir}/zfs"
     ./autogen.sh
     ./configure --prefix=/usr \
@@ -51,30 +49,20 @@ build() {
         --localstatedir=/var \
         --sbindir=/usr/bin \
         --sysconfdir=/etc \
-        --with-spl="${srcdir}/spl" \
-        --with-spl-obj="${srcdir}/spl" \
         --with-linux=/usr/lib/modules/${_kmoddir}/build \
         --with-linux-obj=/usr/lib/modules/${_kmoddir}/build \
         --with-config=kernel
 }
 
-package_zfs-headers-shared() {
+package_zfs-headers-shared-git() {
     pkgdesc="Zettabyte File System shared kernel headers"
     license=("CDDL")
     conflicts=("zfs-headers-shared")
     provides=( "zfs-headers-shared")
+    conflicts=("spl-headers-shared")
+    provides=( "spl-headers-shared")
     cd "${srcdir}/zfs/include"
     make DESTDIR="${pkgdir}" install
 }
 
-package_spl-headers-shared() {
-    pkgdesc="Solaris Porting Layer shared kernel headers"
-    license=("GPL")
-    conflicts=("spl-headers-shared")
-    provides=( "spl-headers-shared")
-    cd "${srcdir}/spl/include"
-    make DESTDIR="${pkgdir}" install
-}
-
-sha256sums=('SKIP'
-            'SKIP')
+sha256sums=('SKIP')

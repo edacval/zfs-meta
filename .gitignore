@@ -2,5 +2,8 @@
 !/README.md
 !/.gitignore
 !/user/
+!/user-git/
 !/kernel/
+!/kernel-git/
 !/shared-headers/
+!/shared-headers-git/

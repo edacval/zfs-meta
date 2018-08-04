@@ -1,7 +1,7 @@
 [Trigger]
 Type = Package
 Operation = Upgrade
-Target = zfs-linux%ALIAS%
+Target = zfs-linux%ALIAS%-git
 
 [Action]
 Description = Updating linux%KERNELNAME% initcpios for zfs
