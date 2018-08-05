@@ -89,15 +89,6 @@ package_zfs-utils() {
     chmod 0750  "${pkgdir}"/etc/sudoers.d
 }
 
-# Generate packaging functions on the fly - evil trick from kernel PKGBUILD
-#for _p in ${pkgname[@]}; do
-#    _tmp=${_p}
-#    _tmp=${_tmp/${_pkgsuffix}}
-#    eval "package_${_p}() {
-#        $(declare -f "_package-${_tmp}")
-#        _package-${_tmp}
-#    }"
-#done
 
 sha256sums=('SKIP'
             'SKIP'
