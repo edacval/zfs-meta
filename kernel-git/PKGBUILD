@@ -104,4 +104,4 @@ for _p in ${pkgname[@]}; do
 done
 
 sha256sums=('SKIP'
-            '05da31393786f6901b1de79a6736ec74082845152bfd90c16cccdad8f10aaf35')
+            '86398e72b43af9ac9b281bade4d6df4953c9cde2b430b4605ecfe8e9b6b6e458')

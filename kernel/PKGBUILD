@@ -13,7 +13,7 @@ pkgname=("zfs-linux${_alias}"
          "spl-linux${_alias}"
          "zfs-linux${_alias}-headers"
          "spl-linux${_alias}-headers")
-pkgver=4.17.11.1.0.7.9
+pkgver=4.17.12.arch1.1.0.7.9
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
@@ -135,4 +135,4 @@ done
 
 sha256sums=('SKIP'
             'SKIP'
-            '18e79db53f386122638ee3cdeb6143571136bac88b179ab349de64d3320f0e28')
+            '9202643352c4287e577f28bae6cdc0076508ca28a6802d91d89c644bd57e96e9')
