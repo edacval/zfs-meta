@@ -74,7 +74,7 @@ _package-zfs-linux() {
     provides=( "spl-linux${_kernelname}")
 
     cd "${srcdir}/zfs/module"
-    make DESTDIR="${pkgdir}" INSTALL_MOD_PATH="/usr" install
+    make DESTDIR="${pkgdir}" DEPMOD=/doesnt/exist INSTALL_MOD_PATH="/usr" install
 
     # Install mkinitcpio hook
     install -Dm644 "${srcdir}"/zfs.hook \
