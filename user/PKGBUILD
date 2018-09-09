@@ -7,7 +7,7 @@ _splrev=${_splrev:-spl-${_tag}}
 
 pkgname=("zfs-utils" "spl-utils")
 pkgver=0.7.10
-pkgrel=1
+pkgrel=2
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
@@ -15,6 +15,7 @@ source=(
     "spl::git+https://github.com/zfsonlinux/spl.git#tag=${_splrev}"
     "zfs-utils.initcpio.hook"
     "zfs-utils.initcpio.install"
+    "zfs-utils.initcpio.zfsencryptssh.install"
     "zfs-utils.bash-completion-r1")
 makedepends=("git")
 
@@ -85,6 +86,7 @@ package_zfs-utils() {
     # Install the support files
     install -D -m644 "${srcdir}"/zfs-utils.initcpio.hook "${pkgdir}"/usr/lib/initcpio/hooks/zfs
     install -D -m644 "${srcdir}"/zfs-utils.initcpio.install "${pkgdir}"/usr/lib/initcpio/install/zfs
+    install -D -m644 "${srcdir}"/zfs-utils.initcpio.zfsencryptssh.install "${pkgdir}"/usr/lib/initcpio/install/zfsencryptssh
     install -D -m644 "${srcdir}"/zfs-utils.bash-completion-r1 "${pkgdir}"/usr/share/bash-completion/completions/zfs
     chmod 0750  "${pkgdir}"/etc/sudoers.d
 }
@@ -92,6 +94,7 @@ package_zfs-utils() {
 
 sha256sums=('SKIP'
             'SKIP'
-            '2ca838f74ce9427138f5925cf886783b5176bbb8db0b9d139775b974888213b6'
-            '8d80740b17a55876c977ac0d6527c23a58b5bc96bb063fabad0eb7cb599e458b'
+            '9214c831e090493b41829293ff03120bdcaab2bebe63efd4714abcc18688e764'
+            'e785c4b2b6dc06e4db9cc5638236c93c962804c50cadd86e1e6e2acdf05dfc0d'
+            '29080a84e5d7e36e63c4412b98646043724621245b36e5288f5fed6914da5b68'
             'b60214f70ffffb62ffe489cbfabd2e069d14ed2a391fac0e36f914238394b540')
