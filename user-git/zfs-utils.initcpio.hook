@@ -48,6 +48,10 @@ zfs_decrypt_fs() {
       ! eval zfs load-key "${encryptionroot}"; do
         sleep 2
     done
+
+    if [ -f /.encryptionroot ]; then
+        rm /.encryptionroot
+    fi
 }
 
 zfs_mount_handler () {
@@ -182,7 +186,7 @@ run_hook() {
 run_latehook () {
     set_flags
     # only run zpool import, if flags were set (cache file found / zfs_import_dir specified)
-    zpool import -N -a ${ZPOOL_FORCE}
+    [ ! "${ZPOOL_IMPORT_FLAGS}" = "" ] && zpool import ${ZPOOL_IMPORT_FLAGS} -N -a ${ZPOOL_FORCE}
 }
 
 # vim:set ts=4 sw=4 ft=sh et:

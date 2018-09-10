@@ -7,7 +7,7 @@ _splrev=${_splrev:-spl-${_tag}}
 
 pkgname=("zfs-utils" "spl-utils")
 pkgver=0.7.10
-pkgrel=2
+pkgrel=3
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
@@ -94,7 +94,7 @@ package_zfs-utils() {
 
 sha256sums=('SKIP'
             'SKIP'
-            '9214c831e090493b41829293ff03120bdcaab2bebe63efd4714abcc18688e764'
+            '3411316aefd5363957888597516445b9fa1f5506fe9c8e0e296eb93bb898b24a'
             'e785c4b2b6dc06e4db9cc5638236c93c962804c50cadd86e1e6e2acdf05dfc0d'
             '29080a84e5d7e36e63c4412b98646043724621245b36e5288f5fed6914da5b68'
             'b60214f70ffffb62ffe489cbfabd2e069d14ed2a391fac0e36f914238394b540')
