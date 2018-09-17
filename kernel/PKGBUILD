@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=0.7.10
+_default_tag=0.7.11
 _kernelname=${_kernelname:-}
 _alias=${_kernelname:--ARCH}
 _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
@@ -13,7 +13,7 @@ pkgname=("zfs-linux${_alias}"
          "spl-linux${_alias}"
          "zfs-linux${_alias}-headers"
          "spl-linux${_alias}-headers")
-pkgver=4.14.68.1.0.7.10
+pkgver=4.14.70.1.0.7.11
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"

@@ -14,8 +14,8 @@ case ${_buildtype} in
 esac
 
 pkgname=("zfs-utils-git")
-pkgver=0.7.10.0
-pkgrel=2
+pkgver=0.7.11
+pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
