@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=0.7.11
+_default_tag=0.7.12
 _kernelname=${_kernelname:-}
 _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux-headers${_kernelname})}
 
@@ -10,7 +10,7 @@ _splrev=${_splrev:-spl-${_tag}}
 
 pkgname=("zfs-headers-shared"
          "spl-headers-shared")
-pkgver=0.7.11
+pkgver=0.7.12
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
