@@ -62,7 +62,7 @@ build() {
         ${srcdir}/zfs/module/Module.symvers
 }
 
-_package-zfs-linux() {
+_package-zfs-linux-git() {
     pkgdesc="Zettabyte File System kernel module for linux${_alias} kernel"
     license=("CDDL")
     depends=("kmod"
@@ -85,7 +85,7 @@ _package-zfs-linux() {
         "${pkgdir}"/usr/share/libalpm/hooks/80-zfs-linux${_alias}-git.hook
 }
 
-_package-zfs-linux-headers() {
+_package-zfs-linux-headers-git() {
     pkgdesc="Zettabyte File System module headers for linux${_alias} kernel"
     license=("CDDL")
     conflicts=("zfs-linux${_kernelname}-headers")
