@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=0.7.12
+_default_tag=0.7.13
 _kernelname=${_kernelname:-}
 _alias=${_kernelname:--ARCH}
 _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
@@ -13,14 +13,13 @@ pkgname=("zfs-linux${_alias}"
          "spl-linux${_alias}"
          "zfs-linux${_alias}-headers"
          "spl-linux${_alias}-headers")
-pkgver=0.7.12
+pkgver=0.7.13
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
     "zfs::git+https://github.com/zfsonlinux/zfs.git#tag=${_zfsrev}"
     "spl::git+https://github.com/zfsonlinux/spl.git#tag=${_splrev}"
-    "4.20.patch::https://raw.githubusercontent.com/archzfs/archzfs/master/src/zfs/upstream-4f981f6-additional-fixes-for-current_kernel_time-in-4.20.patch"
     "zfs.hook")
 makedepends=("git" "linux${_kernelname}-headers=${_kpkgver}")
 
@@ -30,7 +29,7 @@ pkgver() {
 
 prepare() {
     cd "${srcdir}/zfs"
-    patch -Np1 -i "${srcdir}/4.20.patch"
+
     # Remove unwanted or useless features
     sed -i -e '/^SUBDIRS/ s/ rpm//' \
         "${srcdir}/spl/Makefile.am" \
@@ -138,5 +137,4 @@ done
 
 sha256sums=('SKIP'
             'SKIP'
-            '6f27c3dae57c424e06aec31df6c1e1a821e547aa4e933f2f9b894b5e6762b52d'
             '9202643352c4287e577f28bae6cdc0076508ca28a6802d91d89c644bd57e96e9')
