@@ -1,28 +1,22 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_branch=0.7-release
+_default_commit=origin/HEAD
 _kernelname=${_kernelname:-}
 _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
 
-case ${_buildtype} in
-    branch)
-        _branch=${_branch:-${_default_branch}}
-        _zfsrev=${_zfsrev:-zfs-${_branch}}
-        ;;
-    *)
-        _zfscommit=${_zfscommit:-origin/HEAD}
-        _zfsrev=${_zfsrev:-${_zfscommit}}
-        _buildtype=commit
-        ;;
-esac
+_zfsrev=${_zfsrev:-${_default_commit}}
 
 pkgname=("zfs-headers-shared-git")
-pkgver=0.7.11
+pkgver=0.8.0
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
-source=("zfs::git+https://github.com/zfsonlinux/zfs.git#${_buildtype}=${_zfsrev}")
-makedepends=("git" "linux${_kernelname}-headers=${_kpkgver}")
+source=("zfs::git+https://github.com/zfsonlinux/zfs.git#commit=${_zfsrev}")
+makedepends=(
+        "git"
+        "linux${_kernelname}-headers=${_kpkgver}"
+        "python"
+        )
 
 pkgver() {
     local ztag=$(git --git-dir="${srcdir}/zfs/.git" describe --tags --abbrev=0)
@@ -57,11 +51,9 @@ build() {
 
 package_zfs-headers-shared-git() {
     pkgdesc="Zettabyte File System shared kernel headers"
-    license=("CDDL")
+    license=("CDDL" "GPL2")
     conflicts=("zfs-headers-shared")
     provides=( "zfs-headers-shared")
-    conflicts=("spl-headers-shared")
-    provides=( "spl-headers-shared")
     cd "${srcdir}/zfs/include"
     make DESTDIR="${pkgdir}" install
 }

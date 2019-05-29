@@ -1,32 +1,29 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_branch=0.7-release
+_default_commit=origin/HEAD
 _kernelname=${_kernelname:-}
 _alias=${_kernelname:--ARCH}
 _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
 
-case ${_buildtype} in
-    branch)
-        _branch=${_branch:-${_default_branch}}
-        _zfsrev=${_zfsrev:-zfs-${_branch}}
-        ;;
-    *)
-        _zfscommit=${_zfscommit:-origin/HEAD}
-        _zfsrev=${_zfsrev:-${_zfscommit}}
-        _buildtype=commit
-        ;;
-esac
+_zfsrev=${_zfsrev:-${_default_commit}}
 
-pkgname=("zfs-linux${_alias}-git"
-         "zfs-linux${_alias}-headers-git")
-pkgver=4.17.11.1.0.7.0.1668
+pkgname=(
+        "zfs-linux${_alias}-git"
+        "zfs-linux${_alias}-headers-git"
+        )
+pkgver=4.19.46.1.0.8.0.30
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
-    "zfs::git+https://github.com/zfsonlinux/zfs.git#${_buildtype}=${_zfsrev}"
-    "zfs.hook")
-makedepends=("git" "linux${_kernelname}-headers=${_kpkgver}")
+        "zfs::git+https://github.com/zfsonlinux/zfs.git#commit=${_zfsrev}"
+        "zfs.hook"
+       )
+makedepends=(
+        "git"
+        "linux${_kernelname}-headers=${_kpkgver}"
+        "python"
+        )
 
 pkgver() {
     local ztag=$(git --git-dir="${srcdir}/zfs/.git" describe --tags --abbrev=0)
@@ -65,14 +62,13 @@ build() {
 
 _package-zfs-linux-git() {
     pkgdesc="Zettabyte File System kernel module for linux${_alias} kernel"
-    license=("CDDL")
+    license=("CDDL" "GPL2")
     depends=("kmod"
             "linux${_kernelname}=${_kpkgver}"
-            "zfs-utils=${pkgver/#${_kpkgver/-/.}.}")
+            "zfs-utils=${pkgver/#${_kpkgver/-/.}.}"
+            )
     conflicts=("zfs-linux${_kernelname}")
     provides=( "zfs-linux${_kernelname}")
-    conflicts=("spl-linux${_kernelname}")
-    provides=( "spl-linux${_kernelname}")
 
     cd "${srcdir}/zfs/module"
     make DESTDIR="${pkgdir}" DEPMOD=/bin/true INSTALL_MOD_PATH="/usr" install
@@ -88,7 +84,7 @@ _package-zfs-linux-git() {
 
 _package-zfs-linux-headers-git() {
     pkgdesc="Zettabyte File System module headers for linux${_alias} kernel"
-    license=("CDDL")
+    license=("CDDL" "GPL2")
     conflicts=("zfs-linux${_kernelname}-headers")
     provides=("zfs-linux${_kernelname}-headers")
     cd "${srcdir}/zfs"

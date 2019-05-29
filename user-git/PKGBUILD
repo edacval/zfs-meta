@@ -1,30 +1,26 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_branch=0.7-release
-case ${_buildtype} in
-    branch)
-        _branch=${_branch:-${_default_branch}}
-        _zfsrev=${_zfsrev:-zfs-${_branch}}
-        ;;
-    *)
-        _zfscommit=${_zfscommit:-origin/HEAD}
-        _zfsrev=${_zfsrev:-${_zfscommit}}
-        _buildtype=commit
-        ;;
-esac
+_default_commit=origin/HEAD
+_zfsrev=${_zfsrev:-${_default_commit}}
 
 pkgname=("zfs-utils-git")
-pkgver=0.7.11
+pkgver=0.8.0
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
-    "zfs::git+https://github.com/zfsonlinux/zfs.git#${_buildtype}=${_zfsrev}"
-    "zfs-utils.initcpio.hook"
-    "zfs-utils.initcpio.install"
-    "zfs-utils.initcpio.zfsencryptssh.install"
-    "zfs-utils.bash-completion-r1")
-makedepends=("git" "python2-cffi" "python2-setuptools")
+        "zfs::git+https://github.com/zfsonlinux/zfs.git#commit=${_zfsrev}"
+        "zfs-utils.initcpio.hook"
+        "zfs-utils.initcpio.install"
+        "zfs-utils.initcpio.zfsencryptssh.install"
+        "zfs-utils.bash-completion-r1"
+       )
+makedepends=(
+        "git"
+        "python"
+        "python-cffi"
+        "python-setuptools"
+        )
 
 pkgver() {
     local ztag=$(git --git-dir="${srcdir}/zfs/.git" describe --tags --abbrev=0)
@@ -40,25 +36,22 @@ prepare() {
         -e '/^SUBDIRS/ s/ tests//' \
         "${srcdir}/zfs/Makefile.am"
     sed -i \
-        -e 's/ bash_completion.d//' \
-        -e 's/ dracut//' \
-        -e 's/ initramfs//' \
+        -e '/^SUBDIRS/ s/ bash_completion.d//' \
+        -e '/^SUBDIRS/ s/ dracut//' \
+        -e '/^SUBDIRS/ s/ initramfs//' \
         "${srcdir}/zfs/contrib/Makefile.am"
-    # use python2
-    sed -i '1s/python\b/python2/' \
-        "${srcdir}/zfs/cmd/arc_summary/arc_summary.py"
 }
 
 build() {
     cd "${srcdir}/zfs"
     ./autogen.sh
-    PYTHON=/usr/bin/python2 ./configure \
-        --prefix=/usr \
+    ./configure --prefix=/usr \
         --libexecdir=/usr/lib \
         --localstatedir=/var \
         --sbindir=/usr/bin \
         --sysconfdir=/etc \
         --enable-systemd=yes \
+        --enable-pyzfs=yes \
         --enable-sysvinit=no \
         --with-mounthelperdir=/usr/bin \
         --with-udevdir=/usr/lib/udev \
@@ -66,18 +59,16 @@ build() {
     make
 }
 
-
-package() {
+package_zfs-utils-git() {
     pkgdesc="Zettabyte File System userspace tools"
-    license=("CDDL")
-    optdepends=("python2-cffi: pyzfs"
-                "python2: monitoring tools"
-                "sudo: zpool status/iostat disk monitoring as unprivileged user"
-                "smartmontools: zpool status/iostat disk monitoring")
+    license=("CDDL" "GPL2")
+    optdepends=(
+            "python: monitoring tools,pyzfs"
+            "sudo: zpool status/iostat disk monitoring as unprivileged user"
+            "smartmontools: zpool status/iostat disk monitoring"
+            )
     conflicts=("zfs-utils")
     provides=("zfs-utils")
-    conflicts=("spl-utils")
-    provides=("spl-utils")
 
     cd "${srcdir}/zfs"
     make DESTDIR="${pkgdir}" install

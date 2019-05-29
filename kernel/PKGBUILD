@@ -1,35 +1,36 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=0.7.13
+_default_tag=0.8.0
 _kernelname=${_kernelname:-}
 _alias=${_kernelname:--ARCH}
 _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
 
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
-_splrev=${_splrev:-spl-${_tag}}
 
-pkgname=("zfs-linux${_alias}"
-         "spl-linux${_alias}"
-         "zfs-linux${_alias}-headers"
-         "spl-linux${_alias}-headers")
-pkgver=0.7.13
+pkgname=(
+        "zfs-linux${_alias}"
+        "zfs-linux${_alias}-headers"
+        )
+pkgver=${_tag}
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
-    "zfs::git+https://github.com/zfsonlinux/zfs.git#tag=${_zfsrev}"
-    "spl::git+https://github.com/zfsonlinux/spl.git#tag=${_splrev}"
-    "zfs.hook")
-makedepends=("git" "linux${_kernelname}-headers=${_kpkgver}")
+        "zfs::git+https://github.com/zfsonlinux/zfs.git#tag=${_zfsrev}"
+        "zfs.hook"
+       )
+makedepends=(
+        "git"
+        "linux${_kernelname}-headers=${_kpkgver}"
+        "python"
+        )
 
 pkgver() {
             printf "%s.%s" "${_kpkgver/-/.}" "${_tag}"
 }
 
 prepare() {
-    cd "${srcdir}/zfs"
-
     # Remove unwanted or useless features
     sed -i \
         -e '/^SUBDIRS/ s/ rpm//' \
@@ -41,20 +42,6 @@ build() {
     # kernel modules path cannot be guessed from linux${_kernelname}-headers package version so ugly hack:
     _kmoddir=${_kmoddir:-$(< $(pacman -Qlq linux${_kernelname}-headers | grep '/kernel\.release$'))}
 
-    cd "${srcdir}/spl"
-    ./autogen.sh
-    ./configure --prefix=/usr \
-        --libexecdir=/usr/lib \
-        --localstatedir=/var \
-        --sbindir=/usr/bin \
-        --sysconfdir=/etc \
-        --with-linux=/usr/lib/modules/${_kmoddir}/build \
-        --with-linux-obj=/usr/lib/modules/${_kmoddir}/build \
-        --with-config=kernel
-    make
-    # Replace reference to ${srcdir} with proper path
-    sed -i "s|${srcdir}/spl/module/|/usr/lib/modules/${_kmoddir}/extra/|" \
-        ${srcdir}/spl/module/Module.symvers
     cd "${srcdir}/zfs"
     ./autogen.sh
     ./configure --prefix=/usr \
@@ -62,8 +49,6 @@ build() {
         --localstatedir=/var \
         --sbindir=/usr/bin \
         --sysconfdir=/etc \
-        --with-spl="${srcdir}/spl" \
-        --with-spl-obj="${srcdir}/spl" \
         --with-linux=/usr/lib/modules/${_kmoddir}/build \
         --with-linux-obj=/usr/lib/modules/${_kmoddir}/build \
         --with-config=kernel
@@ -75,11 +60,11 @@ build() {
 
 _package-zfs-linux() {
     pkgdesc="Zettabyte File System kernel module for linux${_alias} kernel"
-    license=("CDDL")
+    license=("CDDL" "GPL2")
     depends=("kmod"
             "linux${_kernelname}=${_kpkgver}"
-            "spl-linux${_alias}=$pkgver"
-            "zfs-utils=${pkgver/#${_kpkgver/-/.}.}")
+            "zfs-utils=${pkgver/#${_kpkgver/-/.}.}"
+            )
     conflicts=("zfs-linux${_kernelname}")
     provides=( "zfs-linux${_kernelname}")
 
@@ -95,34 +80,12 @@ _package-zfs-linux() {
         "${pkgdir}"/usr/share/libalpm/hooks/80-zfs-linux${_alias}.hook
 }
 
-_package-spl-linux() {
-    pkgdesc="Solaris Porting Layer linux${_alias} kernel module"
-    license=("GPL")
-    depends=("kmod"
-            "linux${_kernelname}=${_kpkgver}"
-            "spl-utils=${pkgver/#${_kpkgver/-/.}.}")
-    conflicts=("spl-linux${_kernelname}")
-    provides=( "spl-linux${_kernelname}")
-
-    cd "${srcdir}/spl/module"
-    make DESTDIR="${pkgdir}" DEPMOD=/bin/true INSTALL_MOD_PATH="/usr" install
-}
-
 _package-zfs-linux-headers() {
     pkgdesc="Zettabyte File System module headers for linux${_alias} kernel"
-    license=("CDDL")
+    license=("CDDL" "GPL2")
     conflicts=("zfs-linux${_kernelname}-headers")
     provides=("zfs-linux${_kernelname}-headers")
     cd "${srcdir}/zfs"
-    make DESTDIR="${pkgdir}" install-nodist_kernelHEADERS
-}
-
-_package-spl-linux-headers() {
-    pkgdesc="Solaris Porting Layer module headers for linux${_alias} kernel"
-    license=("GPL")
-    conflicts=("spl-linux${_kernelname}-headers")
-    provides=("spl-linux${_kernelname}-headers")
-    cd "${srcdir}/spl"
     make DESTDIR="${pkgdir}" install-nodist_kernelHEADERS
 }
 
@@ -136,5 +99,4 @@ for _p in ${pkgname[@]}; do
 done
 
 sha256sums=('SKIP'
-            'SKIP'
             '9202643352c4287e577f28bae6cdc0076508ca28a6802d91d89c644bd57e96e9')
