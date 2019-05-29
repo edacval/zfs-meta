@@ -2,7 +2,7 @@
 
 _default_branch=0.7-release
 _kernelname=${_kernelname:-}
-_kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux-headers${_kernelname})}
+_kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
 
 case ${_buildtype} in
     branch)

@@ -2,7 +2,7 @@
 
 _default_tag=0.7.13
 _kernelname=${_kernelname:-}
-_kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux-headers${_kernelname})}
+_kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
 
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
