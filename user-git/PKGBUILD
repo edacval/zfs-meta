@@ -4,7 +4,7 @@ _default_commit=origin/HEAD
 _zfsrev=${_zfsrev:-${_default_commit}}
 
 pkgname=("zfs-utils-git")
-pkgver=0.8.0
+pkgver=0.8.1
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"

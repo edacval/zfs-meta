@@ -11,7 +11,7 @@ pkgname=(
         "zfs-linux${_alias}-git"
         "zfs-linux${_alias}-headers-git"
         )
-pkgver=4.19.46.1.0.8.0.30
+pkgver=0.8.1
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
