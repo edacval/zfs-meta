@@ -8,50 +8,34 @@ cd ../kernel
 makepkg -sCr
 cd .. && ls */*-linux-ARCH-*
 ```
-#### Build last commit from current release branch with linux-lts kernel
+#### Build exact ZFS commit with newest linux-lts kernel
 ```sh
-cd user
-makepkg -sCr _buildtype=branch _branch=7.0-release
-cd ../kernel
-makepkg -sCr _buildtype=branch _branch=7.0-release _kernelname=-lts
-cd .. && ls */*-linux-lts-git-*
+cd user-git
+makepkg -sCr _zfsrev=some.rev.id.
+cd ../kernel-git
+makepkg -sCr _zfsrev=some.rev.id. _kernelname=-lts
+cd .. && ls */zfs-linux-lts-git-*
 ```
-#### Build 0.7.1 tag with linux-zen 4.13.4-1 kernel
+#### Build ZFS zfs-0.8.1 tag with linux-zen 5.2.14.zen1 kernel
 ```sh
-cd user
-makepkg -sCr _buildtype=tag _tag=0.7.1
-cd ../kernel
-makepkg -sCr _buildtype=tag _tag=0.7.1 _kpkgver=4.13.4-1 _kernelname=-zen
-cd .. && ls */*-linux-zen-*
+cd user-git
+makepkg -sCr _zfsrev=zfs-0.8.1
+cd ../kernel-git
+makepkg -sCr _zfsrev=zfs-0.8.1 _kernelname=-zen _kpkgver=5.2.14.zen1
+cd .. && ls */zfs-linux-zen-git-*
 ```
-#### Build exact ZFS revision against SPL HEAD  with newest linux-hardened kernel
-```sh
-cd user
-makepkg -sCr _buildtype=commit _splcommit=origin/HEAD _zfscommit=some.rev.id.
-cd ../kernel
-makepkg -sCr _buildtype=commit _splcommit=origin/HEAD _zfscommit=some.rev.id. _kernelname=-hardened
-cd .. && ls */*-linux-hardened-git-*
-```
-
 ### Available Variables
 ```
-_branch
-_buildtype
 _kernelname
 _kpkgver
-_splcommit
-_tag
-_zfscommit
-_kmoddir
+_zfsrev
 ```
 
 ### FAQ
-#### What the pkg 4.13.7.1.0.7.2.0.7.1.13.1 version string contains?
-* 4.13.7.1 = built against kernel pkg 4.13.7-1 , `-` replaced with `.`
-* 0.7.2 = the nearest ZFS tag in the past that is reachable on current branch from checkout, `zfs-` prefix striped.
-* 0.7.1 = the nearest SPL tag in the past that is reachable on current branch from checkout, `spl-` prefix striped.
-* 13 = Number of commits in ZFS since zfs-0.7.2 tag
-* 1 = Number of commits in SPL since spl-0.7.1 tag
+#### What the pkg 5.13.7.1.0.8.2.13 version string contains?
+* 5.13.7.1 = built against kernel pkg 5.13.7-1 , `-` replaced with `.`
+* 0.8.2 = the nearest ZFS tag in the past that is reachable on current branch from checkout, `zfs-` prefix striped.
+* 13 = Number of commits in ZFS since zfs-0.8.2 tag
 
 ### Licenses
 * The license of ZFS is CDDL.
