@@ -1,7 +1,6 @@
-/pkg/
-/src/
+/pkg
+/src
 /*.pkg.tar*
-/*.tmp
 /*.sig
 /*.log
-*.swp
+/*.swp
