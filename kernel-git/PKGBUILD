@@ -36,6 +36,7 @@ prepare() {
     # Remove unwanted or useless features
     sed -i \
         -e '/^SUBDIRS/ s/ rpm//' \
+        -e '/^SUBDIRS/ s/ tests//' \
         "${srcdir}/zfs/Makefile.am"
 }
 
