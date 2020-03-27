@@ -73,12 +73,10 @@ _package-zfs-linux() {
     make DESTDIR="${pkgdir}" DEPMOD=/bin/true INSTALL_MOD_PATH="/usr" install
 
     # Install mkinitcpio hook
-    install -Dm644 "${srcdir}"/zfs.hook \
-        "${pkgdir}"/usr/share/libalpm/hooks/80-zfs-linux${_alias}.hook
-    sed -i \
-        -e "s/%ALIAS%/${_alias}/g" \
+    sed -e "s/%ALIAS%/${_alias}/g" \
         -e "s/%KERNELNAME%/${_kernelname}/g" \
-        "${pkgdir}"/usr/share/libalpm/hooks/80-zfs-linux${_alias}.hook
+        "${srcdir}"/zfs.hook | install -Dm644 /dev/stdin \
+        "${pkgdir}"/usr/share/libalpm/hooks/95-zfs-linux${_alias}.hook
 }
 
 _package-zfs-linux-headers() {
@@ -100,4 +98,4 @@ for _p in ${pkgname[@]}; do
 done
 
 sha256sums=('SKIP'
-            '9202643352c4287e577f28bae6cdc0076508ca28a6802d91d89c644bd57e96e9')
+            'eccf5e63e1f200ed8fdf119dc9a3bc2000d889854973cef903b08866a1769c49')

@@ -1,5 +1,6 @@
 [Trigger]
 Type = Package
+Operation = Install
 Operation = Upgrade
 Target = zfs-linux%ALIAS%-git
 
