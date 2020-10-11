@@ -7,7 +7,7 @@ _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-header
 _zfsrev=${_zfsrev:-${_default_commit}}
 
 pkgname=("zfs-headers-shared-git")
-pkgver=0.8.4
+pkgver=0.8.5
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
