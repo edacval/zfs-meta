@@ -5,7 +5,7 @@ _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
 pkgname=("zfs-utils")
-pkgver=0.8.5
+pkgver=${_tag}
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"

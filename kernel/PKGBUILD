@@ -1,18 +1,18 @@
 # Maintainer <edacval at gmail dot com>
 
 _default_tag=0.8.5
+_tag=${_tag:-${_default_tag}}
+_zfsrev=${_zfsrev:-zfs-${_tag}}
+
 _kernelname=${_kernelname:-}
 _alias=${_kernelname:--ARCH}
 _kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
-
-_tag=${_tag:-${_default_tag}}
-_zfsrev=${_zfsrev:-zfs-${_tag}}
 
 pkgname=(
         "zfs-linux${_alias}"
         "zfs-linux${_alias}-headers"
         )
-pkgver=0.8.5
+pkgver=${_tag}
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
@@ -39,8 +39,6 @@ prepare() {
 }
 
 build() {
-    # After (2018-07-30) commit https://git.archlinux.org/svntogit/packages.git/commit/repos/core-x86_64?h=packages/linux&id=973e9461f3f2a558bfc49f49d659ea3f7e5aec44
-    # kernel modules path cannot be guessed from linux${_kernelname}-headers package version so ugly hack:
     _kmoddir=${_kmoddir:-$(< $(pacman -Qlq linux${_kernelname}-headers | grep '/kernel\.release$'))}
 
     cd "${srcdir}/zfs"
