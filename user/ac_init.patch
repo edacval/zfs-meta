@@ -1,0 +1,38 @@
+diff --git a/configure.ac b/configure.ac
+index c68a9a9b7..8994535dc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -30,13 +30,14 @@
+  * CDDL HEADER END
+  */
+ 
+-AC_INIT(m4_esyscmd(grep ^Name: META | cut -d ':' -f 2 | tr -d ' \n'),
+-	m4_esyscmd(grep ^Version: META | cut -d ':' -f 2 | tr -d ' \n'))
++#AC_INIT([m4_esyscmd_s(grep ^Name: META | cut -d ':' -f 2 )],[m4_esyscmd_s(grep ^Version: META | cut -d ':' -f 2 )])
++#AC_INIT(m4_bregexp(m4_quote(m4_include([META])), [^NAME:\s*\(.*\)], [\1]) ,m4_bregexp(m4_quote(m4_include([META])), [^Version:\s*\(.*\)], [\1]))
++AC_INIT(m4_bregexp(m4_quote(m4_esyscmd(grep ^Name: META)), [^NAME:\s*\(.*\)], [\1]), m4_bregexp(m4_quote(m4_esyscmd(grep ^Version: META)), [^Version:\s*\(.*\)], [\1]))
+ AC_LANG(C)
+ ZFS_AC_META
+ AC_CONFIG_AUX_DIR([config])
+ AC_CONFIG_MACRO_DIR([config])
+-AC_CANONICAL_SYSTEM
++AC_CANONICAL_TARGET
+ AM_MAINTAINER_MODE
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ AM_INIT_AUTOMAKE([subdir-objects])
+@@ -45,12 +46,14 @@ AC_CONFIG_HEADERS([zfs_config.h], [
+ 	awk -f ${ac_srcdir}/config/config.awk zfs_config.h.tmp >zfs_config.h &&
+ 	rm zfs_config.h.tmp) || exit 1])
+ 
++LT_INIT
+ AC_PROG_INSTALL
+ AC_PROG_CC
+-AC_PROG_LIBTOOL
+ PKG_PROG_PKG_CONFIG
+ AM_PROG_AS
+ AM_PROG_CC_C_O
++AM_GNU_GETTEXT([external])
++AM_GNU_GETTEXT_VERSION(0.21)
+ AX_CODE_COVERAGE
+ _AM_PROG_TAR(pax)
+ 
