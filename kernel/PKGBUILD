@@ -19,6 +19,8 @@ url="http://zfsonlinux.org/"
 source=(
         "zfs::git+https://github.com/zfsonlinux/zfs.git#tag=${_zfsrev}"
         "zfs.hook"
+        "autoconf.patch::https://github.com/openzfs/zfs/commit/3c7423946f6d44b49994e1d78385d15633ac20e6.diff"
+        "gettext.patch"
        )
 makedepends=(
         "git"
@@ -31,6 +33,8 @@ pkgver() {
 }
 
 prepare() {
+    patch -N -p1 -d zfs -i "${srcdir}/autoconf.patch"
+    patch -N -p1 -d zfs -i "${srcdir}/gettext.patch"
     # Remove unwanted or useless features
     sed -i \
         -e '/^SUBDIRS/ s/ rpm//' \
@@ -116,4 +120,6 @@ for _p in ${pkgname[@]}; do
 done
 
 sha256sums=('SKIP'
-            'eccf5e63e1f200ed8fdf119dc9a3bc2000d889854973cef903b08866a1769c49')
+            'eccf5e63e1f200ed8fdf119dc9a3bc2000d889854973cef903b08866a1769c49'
+            'b11064ccd364f9abe587a15b9fe1e08e0e9a06b81b77accf93f6d927f315aa29'
+            '255e6dc17d5bd15f3d2eb200b32d31d32f03f090df9367749877fa74440ed90d')
