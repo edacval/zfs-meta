@@ -37,11 +37,26 @@ prepare() {
         -e '/^SUBDIRS/ s/ rpm//' \
         -e '/^SUBDIRS/ s/ tests//' \
         "${srcdir}/zfs/Makefile.am"
+    sed -i -E \
+        -e '/^\s+contrib\/bash_completion\.d\/.+$/d' \
+        -e '/^\s+contrib\/dracut\/.+$/d' \
+        -e '/^\s+contrib\/initramfs\/.+$/d' \
+        -e '/^\s+etc\/default\/.+$/d' \
+        -e '/^\s+etc\/init\.d\/.+$/d' \
+        -e '/^\s+rpm\/.+$/d' \
+        -e '/^\s+tests\/.+$/d' \
+        "${srcdir}/zfs/configure.ac"
     sed -i \
         -e '/^SUBDIRS/ s/ bash_completion.d//' \
         -e '/^SUBDIRS/ s/ dracut//' \
         -e '/^SUBDIRS/ s/ initramfs//' \
         "${srcdir}/zfs/contrib/Makefile.am"
+    sed -i \
+        -e '/^DIST_SUBDIRS/ s/ default//' \
+        -e '/^DIST_SUBDIRS/ s/ init\.d//' \
+        -e '/^SUBDIRS/ s/ default//' \
+        -e '/^SUBDIRS/ s/ \${ZFS_INIT_SYSV)//' \
+        "${srcdir}/zfs/etc/Makefile.am"
 }
 
 build() {
