@@ -16,6 +16,7 @@ source=(
         "zfs-utils.initcpio.install"
         "zfs-utils.initcpio.zfsencryptssh.install"
         "zfs-utils.bash-completion-r1"
+        "gettext.patch"
        )
 makedepends=(
         "git"
@@ -32,6 +33,7 @@ pkgver() {
 }
 
 prepare() {
+    patch -N -p1 -d zfs -i "${srcdir}/gettext.patch"
     # Remove unwanted or useless features
     sed -i \
         -e '/^SUBDIRS/ s/ rpm//' \
@@ -102,4 +104,5 @@ sha256sums=('SKIP'
             '3411316aefd5363957888597516445b9fa1f5506fe9c8e0e296eb93bb898b24a'
             '6d0d8144cad6046df8c19df1a8b9cdd80cbe96e080616a955f87f0f9359fe9b3'
             '29080a84e5d7e36e63c4412b98646043724621245b36e5288f5fed6914da5b68'
-            'b60214f70ffffb62ffe489cbfabd2e069d14ed2a391fac0e36f914238394b540')
+            'b60214f70ffffb62ffe489cbfabd2e069d14ed2a391fac0e36f914238394b540'
+            '255e6dc17d5bd15f3d2eb200b32d31d32f03f090df9367749877fa74440ed90d')
