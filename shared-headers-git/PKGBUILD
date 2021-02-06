@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=0.8.6
+_default_tag=2.0.2
 _tag=${_tag:-${_default_tag}}
 _default_commit=origin/HEAD
 _zfsrev=${_zfsrev:-${_default_commit}}
@@ -15,8 +15,6 @@ arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
         "zfs::git+https://github.com/zfsonlinux/zfs.git#commit=${_zfsrev}"
-        "autoconf.patch::https://github.com/openzfs/zfs/commit/3c7423946f6d44b49994e1d78385d15633ac20e6.diff"
-        "gettext.patch"
        )
 makedepends=(
         "git"
@@ -85,6 +83,4 @@ package_zfs-headers-shared-git() {
     make DESTDIR="${pkgdir}" install
 }
 
-sha256sums=('SKIP'
-            'b11064ccd364f9abe587a15b9fe1e08e0e9a06b81b77accf93f6d927f315aa29'
-            '255e6dc17d5bd15f3d2eb200b32d31d32f03f090df9367749877fa74440ed90d')
+sha256sums=('SKIP')
