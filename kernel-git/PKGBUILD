@@ -20,7 +20,6 @@ url="http://zfsonlinux.org/"
 source=(
         "zfs::git+https://github.com/zfsonlinux/zfs.git#commit=${_zfsrev}"
         "zfs.hook"
-        "gettext.patch"
        )
 makedepends=(
         "git"
@@ -36,7 +35,6 @@ pkgver() {
 }
 
 prepare() {
-    patch -N -p1 -d zfs -i "${srcdir}/gettext.patch"
     # Remove unwanted or useless features
     sed -i \
         -e '/^SUBDIRS/ s/ rpm//' \
@@ -122,5 +120,4 @@ for _p in ${pkgname[@]}; do
 done
 
 sha256sums=('SKIP'
-            '905045238f2119773b1466a1bbc216d38ad764474773eb5c3d5b1f76c11d6bef'
-            '255e6dc17d5bd15f3d2eb200b32d31d32f03f090df9367749877fa74440ed90d')
+            '905045238f2119773b1466a1bbc216d38ad764474773eb5c3d5b1f76c11d6bef')

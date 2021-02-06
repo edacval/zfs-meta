@@ -15,7 +15,6 @@ arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
         "zfs::git+https://github.com/zfsonlinux/zfs.git#commit=${_zfsrev}"
-        "gettext.patch"
        )
 makedepends=(
         "git"
@@ -31,7 +30,6 @@ pkgver() {
 }
 
 prepare() {
-    patch -N -p1 -d zfs -i "${srcdir}/gettext.patch"
     # Remove unwanted or useless features
     sed -i \
         -e '/^SUBDIRS/ s/ rpm//' \
@@ -83,5 +81,4 @@ package_zfs-headers-shared-git() {
     make DESTDIR="${pkgdir}" install
 }
 
-sha256sums=('SKIP'
-            '255e6dc17d5bd15f3d2eb200b32d31d32f03f090df9367749877fa74440ed90d')
+sha256sums=('SKIP')
