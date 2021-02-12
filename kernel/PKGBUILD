@@ -12,7 +12,7 @@ pkgname=(
         "zfs-linux${_alias}"
         "zfs-linux${_alias}-headers"
         )
-pkgver=5.4.97.1.2.0.3
+pkgver=${_tag}
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"

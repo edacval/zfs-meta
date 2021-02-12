@@ -25,10 +25,11 @@ makedepends=(
         )
 
 pkgver() {
-    local ztag=$(git --git-dir="${srcdir}/zfs/.git" describe --tags --abbrev=0)
-        printf "%s.%s" \
-        "$(echo $ztag | sed 's/^zfs-//g; s/-//g')" \
-        "$(git --git-dir="${srcdir}/zfs/.git" rev-list ${ztag}..HEAD --count --)"
+    cd zfs
+    local ztag=$(git describe --tags --abbrev=0)
+    printf "%s.%s" \
+        "$(echo $ztag | sed 's/^zfs-//; s/-//g')" \
+        "$(git rev-list ${ztag}..HEAD --count --)"
 }
 
 prepare() {
