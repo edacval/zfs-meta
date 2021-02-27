@@ -7,7 +7,7 @@ _zfsrev=${_zfsrev:-${_default_commit}}
 
 _kernelname=${_kernelname:-}
 _alias=${_kernelname:--ARCH}
-_kpkgver=${_kpkgver:-$(pacman -Sd --print-format '%v' linux${_kernelname}-headers)}
+_kpkgver=${_kpkgver:-$(pacman -Sdd --print-format '%v' linux${_kernelname}-headers)}
 
 pkgname=(
         "zfs-linux${_alias}-git"
