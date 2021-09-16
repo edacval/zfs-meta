@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.1.0
+_default_tag=2.1.1
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
@@ -12,7 +12,7 @@ pkgname=(
         "zfs-linux${_alias}"
         "zfs-linux${_alias}-headers"
         )
-pkgver=5.12.14.arch1.1.2.1.0
+pkgver=${_tag}
 pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
