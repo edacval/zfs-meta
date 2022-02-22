@@ -18,7 +18,6 @@ arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
         "zfs::git+https://github.com/zfsonlinux/zfs.git#tag=${_zfsrev}"
-        "zfs.hook"
        )
 makedepends=(
         "git"
@@ -91,10 +90,7 @@ _package-zfs-linux() {
     make DESTDIR="${pkgdir}" DEPMOD=/bin/true INSTALL_MOD_PATH="/usr" install
 
     # Install mkinitcpio hook
-    sed -e "s/%ALIAS%/${_alias}/g" \
-        -e "s/%KERNELNAME%/${_kernelname}/g" \
-        "${srcdir}"/zfs.hook | install -Dm644 /dev/stdin \
-        "${pkgdir}"/usr/share/libalpm/hooks/95-zfs-linux${_alias}.hook
+    install -Dm644 /dev/null "${pkgdir}"/usr/lib/initcpio/zfs-linux${_alias}.trigger
 }
 
 _package-zfs-linux-headers() {
@@ -115,5 +111,4 @@ for _p in ${pkgname[@]}; do
     }"
 done
 
-sha256sums=('SKIP'
-            'eccf5e63e1f200ed8fdf119dc9a3bc2000d889854973cef903b08866a1769c49')
+sha256sums=('SKIP')
