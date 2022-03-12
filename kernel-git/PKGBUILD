@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.1.2
+_default_tag=2.1.3
 _tag=${_tag:-${_default_tag}}
 _default_commit=origin/HEAD
 _zfsrev=${_zfsrev:-${_default_commit}}
@@ -92,7 +92,7 @@ _package-zfs-linux-git() {
     provides=( "zfs-linux${_kernelname}")
 
     cd "${srcdir}/zfs/module"
-    make DESTDIR="${pkgdir}" DEPMOD=/bin/true INSTALL_MOD_PATH="/usr" install
+    make DESTDIR="${pkgdir}" DEPMOD=/bin/true INSTALL_MOD_PATH="${pkgdir}/usr" install
 
     # Install mkinitcpio hook
     install -Dm644 /dev/null "${pkgdir}"/usr/lib/initcpio/zfs-linux${_alias}-git.trigger
