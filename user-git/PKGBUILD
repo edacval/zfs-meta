@@ -7,7 +7,7 @@ _zfsrev=${_zfsrev:-${_default_commit}}
 
 pkgname=("zfs-utils-git")
 pkgver=${_tag}
-pkgrel=1
+pkgrel=2
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
@@ -31,6 +31,8 @@ pkgver() {
         "$(echo $ztag | sed 's/^zfs-//; s/-//g')" \
         "$(git rev-list ${ztag}..HEAD --count --)"
 }
+
+backup=('etc/zfs/zed.d/zed.rc')
 
 prepare() {
     # Remove unwanted or useless features
@@ -100,7 +102,7 @@ package_zfs-utils-git() {
 
 
 sha256sums=('SKIP'
-            '3411316aefd5363957888597516445b9fa1f5506fe9c8e0e296eb93bb898b24a'
-            '6d0d8144cad6046df8c19df1a8b9cdd80cbe96e080616a955f87f0f9359fe9b3'
+            '74a20ba343e85ec50fa477e302dcb9a6f1c9262744f5d6df40afdb5231d4235b'
+            'c72e4cc0124df32cf28739c46238d4d2b9571b6f2f84558e105429583d8968eb'
             '29080a84e5d7e36e63c4412b98646043724621245b36e5288f5fed6914da5b68'
             'b60214f70ffffb62ffe489cbfabd2e069d14ed2a391fac0e36f914238394b540')

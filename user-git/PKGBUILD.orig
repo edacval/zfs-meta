@@ -2,15 +2,16 @@
 
 _default_tag=2.1.7
 _tag=${_tag:-${_default_tag}}
-_zfsrev=${_zfsrev:-zfs-${_tag}}
+_default_commit=origin/HEAD
+_zfsrev=${_zfsrev:-${_default_commit}}
 
-pkgname=("zfs-utils")
+pkgname=("zfs-utils-git")
 pkgver=${_tag}
-pkgrel=2
+pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
-        "zfs::git+https://github.com/zfsonlinux/zfs.git#tag=${_zfsrev}"
+        "zfs::git+https://github.com/zfsonlinux/zfs.git#commit=${_zfsrev}"
         "zfs-utils.initcpio.hook"
         "zfs-utils.initcpio.install"
         "zfs-utils.initcpio.zfsencryptssh.install"
@@ -23,7 +24,13 @@ makedepends=(
         "python-setuptools"
         )
 
-backup=('etc/zfs/zed.d/zed.rc')
+pkgver() {
+    cd zfs
+    local ztag=$(git describe --tags --abbrev=0)
+    printf "%s.%s" \
+        "$(echo $ztag | sed 's/^zfs-//; s/-//g')" \
+        "$(git rev-list ${ztag}..HEAD --count --)"
+}
 
 prepare() {
     # Remove unwanted or useless features
@@ -70,7 +77,7 @@ build() {
     make
 }
 
-package_zfs-utils() {
+package_zfs-utils-git() {
     pkgdesc="Zettabyte File System userspace tools"
     license=("CDDL" "GPL2")
     optdepends=(
@@ -93,7 +100,7 @@ package_zfs-utils() {
 
 
 sha256sums=('SKIP'
-            '74a20ba343e85ec50fa477e302dcb9a6f1c9262744f5d6df40afdb5231d4235b'
-            'c72e4cc0124df32cf28739c46238d4d2b9571b6f2f84558e105429583d8968eb'
+            '3411316aefd5363957888597516445b9fa1f5506fe9c8e0e296eb93bb898b24a'
+            '6d0d8144cad6046df8c19df1a8b9cdd80cbe96e080616a955f87f0f9359fe9b3'
             '29080a84e5d7e36e63c4412b98646043724621245b36e5288f5fed6914da5b68'
             'b60214f70ffffb62ffe489cbfabd2e069d14ed2a391fac0e36f914238394b540')
