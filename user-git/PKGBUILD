@@ -1,13 +1,13 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.1.7
+_default_tag=2.1.8
 _tag=${_tag:-${_default_tag}}
 _default_commit=origin/HEAD
 _zfsrev=${_zfsrev:-${_default_commit}}
 
 pkgname=("zfs-utils-git")
 pkgver=${_tag}
-pkgrel=2
+pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(

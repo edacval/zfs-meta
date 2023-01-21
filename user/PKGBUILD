@@ -1,12 +1,12 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.1.7
+_default_tag=2.1.8
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
 pkgname=("zfs-utils")
 pkgver=${_tag}
-pkgrel=2
+pkgrel=1
 arch=("x86_64")
 url="http://zfsonlinux.org/"
 source=(
