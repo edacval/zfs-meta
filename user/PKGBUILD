@@ -79,7 +79,6 @@ package_zfs-utils() {
             "smartmontools: zpool status/iostat disk monitoring"
             )
     conflicts=("zfs-utils")
-    provides=("zfs-utils")
 
     cd "${srcdir}/zfs"
     make DESTDIR="${pkgdir}" install

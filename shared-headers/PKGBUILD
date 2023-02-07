@@ -68,7 +68,6 @@ package_zfs-headers-shared() {
     pkgdesc="Zettabyte File System shared kernel headers"
     license=("CDDL" "GPL2")
     conflicts=("zfs-headers-shared")
-    provides=( "zfs-headers-shared")
     cd "${srcdir}/zfs/include"
     make DESTDIR="${pkgdir}" install
 }
