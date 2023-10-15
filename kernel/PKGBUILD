@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.1.13
+_default_tag=2.2.0
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
@@ -32,32 +32,19 @@ pkgver() {
 prepare() {
     # Remove unwanted or useless features
     sed -i \
-        -e '/^SUBDIRS/ s/ rpm//' \
-        -e '/^SUBDIRS/ s/ tests//' \
         -e '/^include config\/deb.am/d' \
         -e '/^include config\/rpm.am/d' \
+        -e '/^include config\/tgz.am/d' \
+        -e '/^include $(srcdir)\/%D%\/tests\/Makefile.am/d' \
         "${srcdir}/zfs/Makefile.am"
     sed -i -E \
-        -e '/^\s+contrib\/bash_completion\.d\/.+$/d' \
-        -e '/^\s+contrib\/dracut\/.+$/d' \
-        -e '/^\s+contrib\/initramfs\/.+$/d' \
-        -e '/^\s+etc\/init\.d\/.+$/d' \
-        -e '/^\s+include\/os\/freebsd\/.+$/d' \
+        -e '/^\s+contrib\/debian\/rules$/d' \
         -e '/^\s+rpm\/.+$/d' \
         -e '/^\s+tests\/.+$/d' \
         "${srcdir}/zfs/configure.ac"
     sed -i \
-        -e '/^DIST_SUBDIRS/ s/ bash_completion.d//' \
-        -e '/^DIST_SUBDIRS/ s/ dracut//' \
-        -e '/^DIST_SUBDIRS/ s/ initramfs//' \
-        -e '/^SUBDIRS/ s/ bash_completion.d//' \
-        -e '/^SUBDIRS/ s/ dracut//' \
-        -e '/^SUBDIRS/ s/ initramfs//' \
+        -e '/^include $(srcdir)\/%D%\/initramfs\/Makefile.am/d' \
         "${srcdir}/zfs/contrib/Makefile.am"
-    sed -i \
-        -e '/^DIST_SUBDIRS/ s/ init\.d//' \
-        -e '/^SUBDIRS/ s/ $(ZFS_INIT_SYSV)//' \
-        "${srcdir}/zfs/etc/Makefile.am"
 }
 
 build() {
@@ -90,7 +77,7 @@ _package-zfs-linux() {
     provides=( "zfs-linux${_kernelname}")
 
     cd "${srcdir}/zfs/module"
-    make DESTDIR="${pkgdir}" DEPMOD=/bin/true INSTALL_MOD_PATH="${pkgdir}/usr" INSTALL_MOD_STRIP=1 install
+    make DESTDIR="${pkgdir}" DEPMOD=/bin/true INSTALL_MOD_PATH="${pkgdir}/usr" INSTALL_MOD_STRIP=1 modules_install
 
     # Install mkinitcpio hook
     install -Dm644 /dev/null "${pkgdir}"/usr/lib/initcpio/zfs-linux${_alias}.trigger
@@ -101,8 +88,9 @@ _package-zfs-linux-headers() {
     license=("CDDL" "GPL2")
     conflicts=("zfs-linux${_kernelname}-headers")
     provides=("zfs-linux${_kernelname}-headers")
-    cd "${srcdir}/zfs"
-    make DESTDIR="${pkgdir}" install-nodist_kernelHEADERS
+    depends=("zfs-kernel-headers-shared=${_tag}")
+    cd "${srcdir}/zfs/module"
+    make DESTDIR="${pkgdir}" data_install
 }
 
 # Generate packaging functions on the fly - evil trick from kernel PKGBUILD

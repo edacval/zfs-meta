@@ -1,13 +1,13 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.1.13
+_default_tag=2.2.0
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
 _kernelname=${_kernelname:-}
 _kpkgver=${_kpkgver:-$(pacman -Sdd --print-format '%v' linux${_kernelname}-headers)}
 
-pkgname=("zfs-headers-shared")
+pkgname=("zfs-kernel-headers-shared")
 pkgver=${_tag}
 pkgrel=1
 arch=("x86_64")
@@ -24,32 +24,19 @@ makedepends=(
 prepare() {
     # Remove unwanted or useless features
     sed -i \
-        -e '/^SUBDIRS/ s/ rpm//' \
-        -e '/^SUBDIRS/ s/ tests//' \
         -e '/^include config\/deb.am/d' \
         -e '/^include config\/rpm.am/d' \
+        -e '/^include config\/tgz.am/d' \
+        -e '/^include $(srcdir)\/%D%\/tests\/Makefile.am/d' \
         "${srcdir}/zfs/Makefile.am"
     sed -i -E \
-        -e '/^\s+contrib\/bash_completion\.d\/.+$/d' \
-        -e '/^\s+contrib\/dracut\/.+$/d' \
-        -e '/^\s+contrib\/initramfs\/.+$/d' \
-        -e '/^\s+etc\/init\.d\/.+$/d' \
-        -e '/^\s+include\/os\/freebsd\/.+$/d' \
+        -e '/^\s+contrib\/debian\/rules$/d' \
         -e '/^\s+rpm\/.+$/d' \
         -e '/^\s+tests\/.+$/d' \
         "${srcdir}/zfs/configure.ac"
     sed -i \
-        -e '/^DIST_SUBDIRS/ s/ bash_completion.d//' \
-        -e '/^DIST_SUBDIRS/ s/ dracut//' \
-        -e '/^DIST_SUBDIRS/ s/ initramfs//' \
-        -e '/^SUBDIRS/ s/ bash_completion.d//' \
-        -e '/^SUBDIRS/ s/ dracut//' \
-        -e '/^SUBDIRS/ s/ initramfs//' \
+        -e '/^include $(srcdir)\/%D%\/initramfs\/Makefile.am/d' \
         "${srcdir}/zfs/contrib/Makefile.am"
-    sed -i \
-        -e '/^DIST_SUBDIRS/ s/ init\.d//' \
-        -e '/^SUBDIRS/ s/ $(ZFS_INIT_SYSV)//' \
-        "${srcdir}/zfs/etc/Makefile.am"
 }
 
 build() {
@@ -67,10 +54,12 @@ build() {
         --with-config=kernel
 }
 
-package_zfs-headers-shared() {
+package_zfs-kernel-headers-shared() {
     pkgdesc="Zettabyte File System shared kernel headers"
     license=("CDDL" "GPL2")
-    conflicts=("zfs-headers-shared")
+    conflicts=("zfs-kernel-headers-shared")
+    depends=("zfs-utils=${_tag}")
+
     cd "${srcdir}/zfs/include"
     make DESTDIR="${pkgdir}" install
 }
