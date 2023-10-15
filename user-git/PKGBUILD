@@ -15,7 +15,6 @@ source=(
         "zfs-utils.initcpio.hook"
         "zfs-utils.initcpio.install"
         "zfs-utils.initcpio.zfsencryptssh.install"
-        "zfs-utils.bash-completion-r1"
        )
 makedepends=(
         "libaio"
@@ -68,7 +67,7 @@ build() {
         --with-mounthelperdir=/usr/bin \
         --with-udevdir=/usr/lib/udev \
         --with-config=user
-    make
+    make bashcompletiondir=/usr/share/bash-completion/completions
 }
 
 package_zfs-utils-git() {
@@ -86,12 +85,11 @@ package_zfs-utils-git() {
     provides=("zfs-utils")
 
     cd "${srcdir}/zfs"
-    make DESTDIR="${pkgdir}" install
+    make DESTDIR="${pkgdir}" bashcompletiondir=/usr/share/bash-completion/completions install
     # Install the support files
     install -D -m644 "${srcdir}"/zfs-utils.initcpio.hook "${pkgdir}"/usr/lib/initcpio/hooks/zfs
     install -D -m644 "${srcdir}"/zfs-utils.initcpio.install "${pkgdir}"/usr/lib/initcpio/install/zfs
     install -D -m644 "${srcdir}"/zfs-utils.initcpio.zfsencryptssh.install "${pkgdir}"/usr/lib/initcpio/install/zfsencryptssh
-    install -D -m644 "${srcdir}"/zfs-utils.bash-completion-r1 "${pkgdir}"/usr/share/bash-completion/completions/zfs
     chmod 0750  "${pkgdir}"/etc/sudoers.d
 }
 
@@ -99,5 +97,4 @@ package_zfs-utils-git() {
 sha256sums=('SKIP'
             '74a20ba343e85ec50fa477e302dcb9a6f1c9262744f5d6df40afdb5231d4235b'
             'c72e4cc0124df32cf28739c46238d4d2b9571b6f2f84558e105429583d8968eb'
-            '29080a84e5d7e36e63c4412b98646043724621245b36e5288f5fed6914da5b68'
-            'b60214f70ffffb62ffe489cbfabd2e069d14ed2a391fac0e36f914238394b540')
+            '29080a84e5d7e36e63c4412b98646043724621245b36e5288f5fed6914da5b68')
