@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.2.2
+_default_tag=2.2.3
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
