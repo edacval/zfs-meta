@@ -53,6 +53,12 @@ prepare() {
 }
 
 build() {
+    # Disable tree vectorization. Related issues:
+    # https://github.com/openzfs/zfs/issues/13605
+    # https://github.com/openzfs/zfs/issues/13620
+    export CFLAGS="$CFLAGS -fno-tree-vectorize"
+    export CXXFLAGS="$CXXFLAGS -fno-tree-vectorize"
+
     cd "${srcdir}/zfs"
     ./autogen.sh
     ./configure --prefix=/usr \
