@@ -70,6 +70,7 @@ build() {
         --enable-pyzfs=yes \
         --enable-systemd=yes \
         --enable-sysvinit=no \
+        --without-libunwind \
         --with-mounthelperdir=/usr/bin \
         --with-udevdir=/usr/lib/udev \
         --with-config=user
