@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.2.6
+_default_tag=2.2.7
 _tag=${_tag:-${_default_tag}}
 _default_commit=HEAD
 _zfsrev=${_zfsrev:-${_default_commit}}
@@ -105,4 +105,4 @@ package_zfs-utils-git() {
 sha256sums=('SKIP'
             '74a20ba343e85ec50fa477e302dcb9a6f1c9262744f5d6df40afdb5231d4235b'
             'c72e4cc0124df32cf28739c46238d4d2b9571b6f2f84558e105429583d8968eb'
-            '29080a84e5d7e36e63c4412b98646043724621245b36e5288f5fed6914da5b68')
+            'e069800906a9069f0eed01f95639ab7ff80ed69b6ebe30b4df21c1639d13a868')
