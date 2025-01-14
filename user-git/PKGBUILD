@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.2.7
+_default_tag=2.3.0
 _tag=${_tag:-${_default_tag}}
 _default_commit=HEAD
 _zfsrev=${_zfsrev:-${_default_commit}}
@@ -37,27 +37,22 @@ backup=('etc/zfs/zed.d/zed.rc')
 prepare() {
     # Remove unwanted or useless features
     sed -i \
-        -e '/^include config\/deb.am/d' \
-        -e '/^include config\/rpm.am/d' \
-        -e '/^include config\/tgz.am/d' \
+        -e '/^include $(srcdir)\/%D%\/rpm\/Makefile.am/d' \
         -e '/^include $(srcdir)\/%D%\/tests\/Makefile.am/d' \
         "${srcdir}/zfs/Makefile.am"
     sed -i -E \
-        -e '/^\s+contrib\/debian\/rules$/d' \
+        -e '/^\s+contrib\/debian\/.+$/d' \
         -e '/^\s+rpm\/.+$/d' \
         -e '/^\s+tests\/.+$/d' \
         "${srcdir}/zfs/configure.ac"
     sed -i \
+        -e '/^include $(srcdir)\/%D%\/debian\/Makefile.am/d' \
+        -e '/^include $(srcdir)\/%D%\/dracut\/Makefile.am/d' \
         -e '/^include $(srcdir)\/%D%\/initramfs\/Makefile.am/d' \
         "${srcdir}/zfs/contrib/Makefile.am"
 }
 
 build() {
-    # Disable tree vectorization. Related issues:
-    # https://github.com/openzfs/zfs/issues/13605
-    # https://github.com/openzfs/zfs/issues/13620
-    export CFLAGS="$CFLAGS -fno-tree-vectorize"
-    export CXXFLAGS="$CXXFLAGS -fno-tree-vectorize"
 
     cd "${srcdir}/zfs"
     ./autogen.sh
@@ -74,7 +69,7 @@ build() {
         --with-mounthelperdir=/usr/bin \
         --with-udevdir=/usr/lib/udev \
         --with-config=user
-    make bashcompletiondir=/usr/share/bash-completion/completions
+    make
 }
 
 package_zfs-utils-git() {
@@ -92,13 +87,14 @@ package_zfs-utils-git() {
     provides=("zfs-utils")
 
     cd "${srcdir}/zfs"
-    make DESTDIR="${pkgdir}" bashcompletiondir=/usr/share/bash-completion/completions install
+    make DESTDIR="${pkgdir}" install
 
     # Install the support files
     install -D -m644 "${srcdir}"/zfs-utils.initcpio.hook "${pkgdir}"/usr/lib/initcpio/hooks/zfs
     install -D -m644 "${srcdir}"/zfs-utils.initcpio.install "${pkgdir}"/usr/lib/initcpio/install/zfs
     install -D -m644 "${srcdir}"/zfs-utils.initcpio.zfsencryptssh.install "${pkgdir}"/usr/lib/initcpio/install/zfsencryptssh
     chmod 0750  "${pkgdir}"/etc/sudoers.d
+    rm -rf "${pkgdir}"/etc/default
 }
 
 

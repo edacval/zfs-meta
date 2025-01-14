@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.2.7
+_default_tag=2.3.0
 _tag=${_tag:-${_default_tag}}
 _default_commit=HEAD
 _zfsrev=${_zfsrev:-${_default_commit}}
@@ -37,17 +37,17 @@ pkgver() {
 prepare() {
     # Remove unwanted or useless features
     sed -i \
-        -e '/^include config\/deb.am/d' \
-        -e '/^include config\/rpm.am/d' \
-        -e '/^include config\/tgz.am/d' \
+        -e '/^include $(srcdir)\/%D%\/rpm\/Makefile.am/d' \
         -e '/^include $(srcdir)\/%D%\/tests\/Makefile.am/d' \
         "${srcdir}/zfs/Makefile.am"
     sed -i -E \
-        -e '/^\s+contrib\/debian\/rules$/d' \
+        -e '/^\s+contrib\/debian\/.+$/d' \
         -e '/^\s+rpm\/.+$/d' \
         -e '/^\s+tests\/.+$/d' \
         "${srcdir}/zfs/configure.ac"
     sed -i \
+        -e '/^include $(srcdir)\/%D%\/debian\/Makefile.am/d' \
+        -e '/^include $(srcdir)\/%D%\/dracut\/Makefile.am/d' \
         -e '/^include $(srcdir)\/%D%\/initramfs\/Makefile.am/d' \
         "${srcdir}/zfs/contrib/Makefile.am"
 }
