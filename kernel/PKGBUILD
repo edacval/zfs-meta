@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.3.0
+_default_tag=2.3.1
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
@@ -102,4 +102,4 @@ for _p in ${pkgname[@]}; do
     }"
 done
 
-sha256sums=('f9514904f0e9d3fc575ff5b68c17ed94129400a05981d907712b22368c68c72e')
+sha256sums=('05a9e750b39fa2ba26b49e68e82a838d580bf4bf7acc276d75a870b60cece1b2')

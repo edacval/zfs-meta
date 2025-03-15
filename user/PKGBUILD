@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.3.0
+_default_tag=2.3.1
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
@@ -87,7 +87,7 @@ package_zfs-utils() {
 }
 
 
-sha256sums=('f9514904f0e9d3fc575ff5b68c17ed94129400a05981d907712b22368c68c72e'
+sha256sums=('05a9e750b39fa2ba26b49e68e82a838d580bf4bf7acc276d75a870b60cece1b2'
             '74a20ba343e85ec50fa477e302dcb9a6f1c9262744f5d6df40afdb5231d4235b'
             'c72e4cc0124df32cf28739c46238d4d2b9571b6f2f84558e105429583d8968eb'
             'e069800906a9069f0eed01f95639ab7ff80ed69b6ebe30b4df21c1639d13a868')
