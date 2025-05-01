@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.3.1
+_default_tag=2.3.2
 _tag=${_tag:-${_default_tag}}
 _default_commit=HEAD
 _zfsrev=${_zfsrev:-${_default_commit}}
