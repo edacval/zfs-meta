@@ -1,6 +1,6 @@
 # Maintainer <edacval at gmail dot com>
 
-_default_tag=2.4.1
+_default_tag=2.4.2
 _tag=${_tag:-${_default_tag}}
 _zfsrev=${_zfsrev:-zfs-${_tag}}
 
@@ -64,4 +64,4 @@ package_zfs-kernel-headers-shared() {
     make DESTDIR="${pkgdir}" install
 }
 
-sha256sums=('f06ac1dd2ca80dfe5c31efc836fe95ce4201f49dd0dda2f28b88ef4f28b6cb87')
+sha256sums=('13ba129e0c9f45b81c8915292c6cc534e336dfb70564e56c094d350e9208c9f5')
